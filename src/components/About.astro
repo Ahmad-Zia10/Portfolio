@@ -1,0 +1,115 @@
+---
+import { site, roster } from "../site";
+import AwardsBoard from "./AwardsBoard.astro";
+import AwardsMarquee from "./AwardsMarquee.astro";
+---
+
+<section class="about" id="about" aria-labelledby="about-h">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display" id="about-h">
+        <span class="section-head__clip"><span data-section-word>About</span></span>
+      </h2>
+      <span class="section-head__code">05-10-02 / {site.location}</span>
+    </div>
+
+    <div class="about__grid" data-reveal-group>
+      <div class="about__bio" data-reveal>
+        <p>
+          I'm {site.name}, an AI engineer in {site.location}. I build systems
+          that finish the job — agents that complete transactions rather than
+          describe them, retrieval you can hold to a citation, and voice
+          pipelines fast enough to feel like a conversation.
+        </p>
+        <p>
+          Most recently that's meant a speech-to-speech agent answering a real
+          phone line in under a second, and a documentation assistant grounded
+          in 700+ pages with the evals to prove it. I care about the number that
+          says whether it worked.
+        </p>
+      </div>
+
+      <div class="about__roster" data-reveal>
+        <p class="label about__rosterTitle">Where I've been</p>
+        <ul>
+          {
+            roster.map((r) => (
+              <li class="about__rosterItem">
+                <span class="about__rosterName">{r.name}</span>
+                <span class="about__rosterDetail">{r.detail}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="about__board">
+      <p class="label about__boardTitle">Credentials · departures</p>
+      <AwardsBoard />
+    </div>
+  </div>
+
+  <div class="about__marquee">
+    <AwardsMarquee />
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-bottom: var(--space-8);
+  }
+
+  .about__grid {
+    display: grid;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  @media (min-width: 900px) {
+    .about__grid {
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  .about__bio p {
+    max-width: 58ch;
+  }
+
+  .about__bio p + p {
+    margin-top: var(--space-2);
+  }
+
+  .about__rosterTitle,
+  .about__boardTitle {
+    opacity: 0.6;
+    margin-bottom: var(--space-2);
+  }
+
+  .about__rosterItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .about__rosterName {
+    font-weight: var(--weight-bold);
+  }
+
+  .about__rosterDetail {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    opacity: 0.7;
+  }
+
+  .about__board {
+    margin-top: var(--space-8);
+  }
+
+  .about__marquee {
+    margin-top: var(--space-8);
+  }
+</style>

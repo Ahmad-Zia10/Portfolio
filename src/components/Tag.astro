@@ -1,0 +1,31 @@
+---
+interface Props {
+  label: string;
+  dir?: "up" | "down";
+}
+
+const { label, dir = "up" } = Astro.props;
+---
+
+<span class="tag">
+  <svg class="tag__marker" viewBox="0 0 10 10" aria-hidden="true">
+    {
+      dir === "up" ? (
+        <path d="M5 0 10 10H0Z" fill="currentColor" />
+      ) : (
+        <path d="M5 10 0 0h10Z" fill="currentColor" />
+      )
+    }
+  </svg>
+  {label}
+</span>
+
+<style>
+  .tag {
+    opacity: 0.85;
+  }
+
+  .tag__marker {
+    color: var(--card-accent, var(--color-accent));
+  }
+</style>

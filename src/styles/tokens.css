@@ -1,0 +1,79 @@
+/* ============================================================
+   DESIGN TOKENS — single source of truth.
+   Nothing outside this file hard-codes a color, size, or easing.
+   ============================================================ */
+
+@font-face {
+  font-family: "Martian Mono";
+  src: url("/fonts/martian-mono-latin.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* ---- Color ---- */
+  --color-brand: #2c44ff; /* electric cobalt — primary background */
+  --color-ink: #0a0a0a; /* near-black — text, cards, logo */
+  --color-paper: #ffffff; /* white — display headings, key text */
+
+  /* Accent: gold. Retuned from the brief's magenta (#B622C4), which scored
+     1.19:1 on the brand blue and 3.79:1 on ink — both fail WCAG AA.
+     Gold scores 4.06:1 on brand (AA large) and 12.91:1 on ink (AAA). */
+  --color-accent: #ffc864;
+
+  /* Illustration-only palette (inside artwork, never UI chrome) */
+  --illus-cream: #ede4cf;
+  --illus-green: #2fa02f;
+  --illus-deep: #1a2bb0; /* shaded cobalt for illustration depth */
+
+  /* Semantic aliases */
+  --bg: var(--color-brand);
+  --fg: var(--color-paper);
+  --surface: var(--color-ink);
+  --surface-fg: var(--color-paper);
+  --hairline: rgba(255, 255, 255, 0.28);
+  --hairline-ink: rgba(255, 255, 255, 0.16);
+
+  /* ---- Type ---- */
+  --font-mono: "Martian Mono", "Space Mono", ui-monospace, "JetBrains Mono",
+    monospace;
+
+  --fs-display: clamp(3rem, 11vw, 11rem);
+  --fs-h1: clamp(2.25rem, 6vw, 5rem);
+  --fs-h2: clamp(1.6rem, 4vw, 3rem);
+  --fs-h3: clamp(1.1rem, 2.5vw, 1.75rem);
+  --fs-body: clamp(0.9375rem, 1.1vw, 1.0625rem);
+  --fs-label: 0.6875rem;
+
+  --tracking-label: 0.12em;
+  --tracking-display: -0.04em;
+  --leading-tight: 0.95;
+  --leading-body: 1.6;
+  --weight-regular: 400;
+  --weight-bold: 700;
+
+  /* ---- Space & layout ---- */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 5rem;
+  --space-12: 8rem;
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --maxw: 1600px;
+  --radius: 0;
+  --radius-pill: 999px;
+  --nav-h: 4.5rem;
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 0.25s;
+  --dur: 0.5s;
+  --dur-slow: 0.9s;
+}

@@ -1,0 +1,160 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import Tag from "../components/Tag.astro";
+
+const experiments = [
+  {
+    code: "EXP-01",
+    name: "Graph RAG over a codebase",
+    status: "In progress",
+    tags: ["RETRIEVAL", "GRAPHS"],
+    note: "Indexing call graphs instead of chunks, to see whether multi-hop questions about a repo get better when structure is explicit.",
+  },
+  {
+    code: "EXP-02",
+    name: "Latency budget for voice",
+    status: "Notes",
+    tags: ["VOICE", "BENCHMARK"],
+    note: "Breaking the sub-second target into its parts — VAD, STT, first token, TTS — and finding which one actually moves the number.",
+  },
+  {
+    code: "EXP-03",
+    name: "Evals as a build step",
+    status: "Idea",
+    tags: ["EVALS", "CI"],
+    note: "Treating retrieval quality like a test suite: fail the build when hit-rate drops below a threshold.",
+  },
+];
+---
+
+<BaseLayout
+  title="Lab"
+  description="Experiments, half-finished ideas, and things I'm measuring."
+>
+  <Nav slot="nav" />
+
+  <section class="lab">
+    <div class="shell">
+      <div class="section-head">
+        <h1 class="display">
+          <span class="section-head__clip"><span data-section-word>Lab</span></span>
+        </h1>
+        <span class="section-head__code">07-00-03 / experiments</span>
+      </div>
+
+      <p class="lab__lede">
+        Things I'm poking at. Unfinished on purpose — this page exists so the
+        half-formed ideas have somewhere to live.
+      </p>
+
+      <ul class="lab__list" data-reveal-group>
+        {
+          experiments.map((e) => (
+            <li class="lab__item" data-reveal>
+              <div class="lab__itemTop">
+                <span class="label lab__code">{e.code}</span>
+                <span class="label lab__status">{e.status}</span>
+              </div>
+              <h2 class="lab__name">{e.name}</h2>
+              <p class="lab__note">{e.note}</p>
+              <ul class="lab__tags">
+                {e.tags.map((t, i) => (
+                  <li>
+                    <Tag label={t} dir={i % 2 === 0 ? "up" : "down"} />
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .lab {
+    padding-top: var(--nav-h);
+    padding-bottom: var(--space-8);
+  }
+
+  .section-head__clip {
+    display: block;
+    overflow: hidden;
+  }
+
+  .section-head__clip > span {
+    display: block;
+  }
+
+  .lab__lede {
+    max-width: 52ch;
+    margin-top: var(--space-4);
+    font-size: var(--fs-h3);
+    line-height: 1.45;
+  }
+
+  .lab__list {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 800px) {
+    .lab__list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .lab__item {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    color: var(--surface-fg);
+    border: 1px solid var(--hairline-ink);
+    padding: var(--space-3);
+  }
+
+  .lab__itemTop {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .lab__code {
+    color: var(--color-accent);
+  }
+
+  .lab__status {
+    opacity: 0.55;
+  }
+
+  .lab__name {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    line-height: 1.2;
+    margin-top: var(--space-3);
+  }
+
+  .lab__note {
+    margin-top: var(--space-2);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.85;
+    flex: 1;
+  }
+
+  .lab__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.9rem;
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+  }
+</style>

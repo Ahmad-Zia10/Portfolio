@@ -1,0 +1,157 @@
+---
+import { board } from "../site";
+---
+
+<div class="dep" data-reveal-group>
+  <div class="dep__chrome">
+    <span class="label">Departures</span>
+    <span class="label dep__now">Now boarding · {board.length} records</span>
+  </div>
+
+  <div class="dep__head" aria-hidden="true">
+    <span class="label">Code</span>
+    <span class="label">Destination</span>
+    <span class="label dep__hide">Gate</span>
+    <span class="label dep__right">Status</span>
+  </div>
+
+  <ul>
+    {
+      board.map((r) => (
+        <li class="dep__row" data-reveal>
+          <span class="dep__code">{r.code}</span>
+          <span class="dep__dest">
+            {r.dest}
+            <span class="dep__sub">{r.detail}</span>
+          </span>
+          <span class="dep__gate dep__hide">{r.gate}</span>
+          <span class="dep__status" data-live={r.live ? "true" : undefined}>
+            {r.status}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .dep {
+    background: var(--color-ink);
+    border: 1px solid var(--hairline);
+    padding: var(--space-3) var(--space-3) var(--space-2);
+  }
+
+  .dep__chrome {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--hairline-ink);
+    flex-wrap: wrap;
+  }
+
+  .dep__now {
+    opacity: 0.55;
+  }
+
+  .dep__head,
+  .dep__row {
+    display: grid;
+    grid-template-columns: 3.75rem 1fr 2.75rem 7rem;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .dep__head {
+    opacity: 0.45;
+    padding-block: var(--space-2) 0.5rem;
+  }
+
+  .dep__right {
+    text-align: right;
+  }
+
+  .dep__row {
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--hairline-ink);
+  }
+
+  .dep__row:last-child {
+    border-bottom: 0;
+  }
+
+  .dep__code {
+    font-weight: var(--weight-bold);
+    font-size: 0.8rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    text-align: center;
+    padding: 0.2em 0;
+    letter-spacing: 0.06em;
+  }
+
+  .dep__dest {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    min-width: 0;
+  }
+
+  .dep__sub {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    opacity: 0.55;
+  }
+
+  .dep__gate {
+    opacity: 0.6;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+  }
+
+  .dep__status {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-accent);
+    text-align: right;
+  }
+
+  .dep__status[data-live]::before {
+    content: "";
+    display: inline-block;
+    width: 0.45em;
+    height: 0.45em;
+    border-radius: 50%;
+    background: var(--color-accent);
+    margin-right: 0.45em;
+    vertical-align: 0.1em;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .dep {
+      padding-inline: var(--space-2);
+    }
+
+    .dep__head,
+    .dep__row {
+      grid-template-columns: 3.4rem 1fr 5.5rem;
+    }
+
+    .dep__hide {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dep__status[data-live]::before {
+      animation: none;
+    }
+  }
+</style>

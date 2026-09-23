@@ -1,0 +1,15 @@
+# Normalize line endings to LF in the repository. Without this, committing
+# from Windows rewrites every line on checkout and produces whole-file diffs
+# for collaborators and CI on other platforms.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending converted.
+*.woff2 binary
+*.ico   binary
+*.png   binary
+*.jpg   binary
+*.webp  binary
+*.avif  binary
+
+# Lockfile: keep diffs intact, don't try to merge it by hand.
+pnpm-lock.yaml -diff merge=binary linguist-generated=true

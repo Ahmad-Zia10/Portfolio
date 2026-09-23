@@ -1,0 +1,174 @@
+---
+import Tag from "./Tag.astro";
+
+interface Props {
+  code: string;
+  client: string;
+  name: string;
+  year: string;
+  tags: readonly string[];
+  slug: string;
+  summary: string;
+  accentColor?: string;
+  index: number;
+  total: number;
+}
+
+const {
+  code,
+  client,
+  name,
+  year,
+  tags,
+  slug,
+  summary,
+  accentColor,
+  index,
+  total,
+} = Astro.props;
+---
+
+<article
+  class="card"
+  style={accentColor ? `--card-accent:${accentColor}` : undefined}
+>
+  <div class="card__top">
+    <span class="card__code">{code}</span>
+    <span class="label card__idx">{String(index).padStart(2, "0")}/{String(total).padStart(2, "0")}</span>
+  </div>
+
+  <div class="card__body">
+    <p class="label card__client">Client</p>
+    <h3 class="card__name">
+      <a class="card__link" href={`/work/${slug}`}>
+        {name}
+        <span class="sr-only"> — {client}</span>
+      </a>
+    </h3>
+    <p class="card__meta">{client} · {year}</p>
+    <p class="card__summary">{summary}</p>
+  </div>
+
+  <ul class="card__tags">
+    {
+      tags.map((t, i) => (
+        <li>
+          <Tag label={t} dir={i % 2 === 0 ? "up" : "down"} />
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="card__foot">
+    <span class="label">View case</span>
+    <svg class="card__arrow" viewBox="0 0 120 10" aria-hidden="true">
+      <path d="M0 5h113" stroke="currentColor" stroke-width="1.25" fill="none"></path>
+      <path d="M108 1l5 4-5 4" stroke="currentColor" stroke-width="1.25" fill="none"></path>
+    </svg>
+  </div>
+</article>
+
+<style>
+  .card {
+    --card-accent: var(--color-accent);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--surface);
+    color: var(--surface-fg);
+    border: 1px solid var(--hairline-ink);
+    padding: var(--space-3);
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--card-accent);
+  }
+
+  .card__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--hairline-ink);
+  }
+
+  .card__code {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: var(--weight-bold);
+    line-height: 0.9;
+    letter-spacing: var(--tracking-display);
+    color: var(--card-accent);
+  }
+
+  .card__idx {
+    opacity: 0.5;
+  }
+
+  .card__body {
+    padding-block: var(--space-3);
+    flex: 1;
+  }
+
+  .card__client {
+    opacity: 0.5;
+  }
+
+  .card__name {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    line-height: 1.15;
+    margin-block: 0.35rem 0.5rem;
+  }
+
+  /* Whole card is the click target. */
+  .card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .card__meta {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .card__summary {
+    margin-top: var(--space-2);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.9rem;
+    padding-block: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+  }
+
+  .card__foot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+    color: var(--card-accent);
+  }
+
+  .card__arrow {
+    flex: 1;
+    height: 10px;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .card:hover .card__arrow {
+    transform: translateX(6px);
+  }
+</style>

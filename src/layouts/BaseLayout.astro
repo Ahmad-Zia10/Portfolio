@@ -1,0 +1,80 @@
+---
+import { ClientRouter } from "astro:transitions";
+import { site } from "../site";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+
+const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#2C44FF" />
+
+    <link
+      rel="preload"
+      href="/fonts/martian-mono-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL("/og-image.svg", Astro.site ?? site.url).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot name="nav" />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <slot name="footer" />
+
+    <script>
+      import { initUI } from "../scripts/ui";
+
+      // Nav + carousel enhancement. Runs on first load and after every
+      // view transition.
+      initUI();
+      document.addEventListener("astro:page-load", initUI);
+
+      // Content is visible by default. [data-reveal] elements are only hidden
+      // once GSAP has actually loaded and can animate them back in, so a failed
+      // chunk, a slow network, or a JS error can never leave the page blank.
+      if (window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+        import("../scripts/animations")
+          .then((m) => m.init())
+          .catch(() => {
+            delete document.documentElement.dataset.motion;
+          });
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

@@ -1,0 +1,148 @@
+---
+import { getCollection } from "astro:content";
+import ProjectCard from "./ProjectCard.astro";
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const total = projects.length;
+---
+
+<section class="work" id="work" aria-labelledby="work-h">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display" id="work-h">
+        <span class="section-head__clip"><span data-section-word>Work</span></span>
+      </h2>
+      <span class="section-head__code">02-14-08 / {total} projects</span>
+    </div>
+  </div>
+
+  <div class="work__viewport">
+    <ul class="work__track" data-carousel-track tabindex="0" aria-label="Projects, scrollable">
+      {
+        projects.map((p, i) => (
+          <li class="work__item" data-carousel-item>
+            <ProjectCard
+              code={p.data.code}
+              client={p.data.client}
+              name={p.data.name}
+              year={p.data.year}
+              tags={p.data.tags}
+              slug={p.id}
+              summary={p.data.summary}
+              accentColor={p.data.accentColor}
+              index={i + 1}
+              total={total}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="shell work__controls" data-carousel-controls hidden>
+    <button class="work__btn" type="button" data-carousel-prev aria-label="Previous project">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="2"></path>
+      </svg>
+    </button>
+    <p class="work__counter" aria-live="polite">
+      <span data-carousel-current>1</span>/<span>{total}</span>
+    </p>
+    <button class="work__btn" type="button" data-carousel-next aria-label="Next project">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2"></path>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<style>
+  .section-head__clip {
+    display: block;
+    overflow: hidden;
+  }
+
+  .section-head__clip > span {
+    display: block;
+  }
+
+  .work__viewport {
+    margin-top: var(--space-4);
+  }
+
+  .work__track {
+    display: flex;
+    gap: var(--space-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-inline: var(--gutter);
+    padding-bottom: var(--space-2);
+    scrollbar-width: thin;
+    scrollbar-color: var(--hairline) transparent;
+  }
+
+  .work__track:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .work__item {
+    flex: 0 0 min(88vw, 26rem);
+    scroll-snap-align: start;
+  }
+
+  .work__controls[hidden] {
+    display: none;
+  }
+
+  .work__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .work__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-paper);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out);
+  }
+
+  .work__btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .work__btn:hover:not(:disabled) {
+    background: var(--color-paper);
+    color: var(--color-brand);
+  }
+
+  .work__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .work__counter {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+  }
+
+  @media (min-width: 1100px) {
+    .work__item {
+      flex-basis: 24rem;
+    }
+  }
+</style>
+

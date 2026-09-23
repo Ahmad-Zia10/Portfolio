@@ -1,0 +1,293 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Nav from "../../components/Nav.astro";
+import Footer from "../../components/Footer.astro";
+import Tag from "../../components/Tag.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  const sorted = projects.sort((a, b) => a.data.order - b.data.order);
+
+  return sorted.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: {
+      entry,
+      prev: sorted[(i - 1 + sorted.length) % sorted.length],
+      next: sorted[(i + 1) % sorted.length],
+    },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+
+<BaseLayout title={d.name} description={d.summary}>
+  <Nav slot="nav" />
+
+  <article class="proj">
+    <div class="shell">
+      <a class="proj__back" href="/#work">← All work</a>
+
+      <header class="proj__head">
+        <p class="proj__code">{d.code}</p>
+        <h1 class="proj__title">{d.name}</h1>
+        <p class="proj__meta">{d.client} · {d.year}</p>
+        <p class="proj__summary">{d.summary}</p>
+
+        <ul class="proj__tags">
+          {
+            d.tags.map((t, i) => (
+              <li>
+                <Tag label={t} dir={i % 2 === 0 ? "up" : "down"} />
+              </li>
+            ))
+          }
+        </ul>
+
+        {
+          (d.repo || d.live) && (
+            <div class="proj__links">
+              {d.repo && (
+                <a class="pill" href={d.repo} target="_blank" rel="noopener">
+                  [Source]
+                </a>
+              )}
+              {d.live && (
+                <a class="pill pill--ghost" href={d.live} target="_blank" rel="noopener">
+                  [Live]
+                </a>
+              )}
+            </div>
+          )
+        }
+      </header>
+
+      {
+        d.metrics && (
+          <ul class="proj__metrics">
+            {d.metrics.map((m) => (
+              <li class="proj__metric">
+                <span class="proj__metricValue">{m.value}</span>
+                <span class="label proj__metricLabel">{m.label}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      <div class="proj__cols">
+        <div class="proj__prose">
+          <Content />
+        </div>
+
+        <aside class="proj__aside" aria-labelledby="stack-h">
+          <p class="label proj__asideTitle" id="stack-h">Stack</p>
+          <ul>
+            {d.stack.map((s) => <li class="proj__stackItem">{s}</li>)}
+          </ul>
+        </aside>
+      </div>
+
+      <nav class="proj__pager" aria-label="More projects">
+        <a class="proj__pagerLink" href={`/work/${prev.id}`}>
+          <span class="label">← Previous</span>
+          <span class="proj__pagerName">{prev.data.name}</span>
+        </a>
+        <a class="proj__pagerLink proj__pagerLink--next" href={`/work/${next.id}`}>
+          <span class="label">Next →</span>
+          <span class="proj__pagerName">{next.data.name}</span>
+        </a>
+      </nav>
+    </div>
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .proj {
+    padding-top: calc(var(--nav-h) + var(--space-6));
+    padding-bottom: var(--space-8);
+  }
+
+  .proj__back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .proj__back:hover {
+    color: var(--color-accent);
+  }
+
+  .proj__head {
+    padding-block: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .proj__code {
+    font-size: clamp(3rem, 12vw, 9rem);
+    font-weight: var(--weight-bold);
+    line-height: 0.9;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-accent);
+  }
+
+  .proj__title {
+    font-size: var(--fs-h1);
+    font-weight: var(--weight-bold);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-top: var(--space-2);
+  }
+
+  .proj__meta {
+    margin-top: var(--space-2);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .proj__summary {
+    margin-top: var(--space-3);
+    max-width: 58ch;
+    font-size: var(--fs-h3);
+    line-height: 1.45;
+  }
+
+  .proj__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-top: var(--space-3);
+  }
+
+  .proj__links {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .proj__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1px;
+    margin-top: var(--space-6);
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+  }
+
+  .proj__metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    padding: var(--space-3);
+    background: var(--bg);
+  }
+
+  .proj__metricValue {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    color: var(--color-accent);
+  }
+
+  .proj__metricLabel {
+    opacity: 0.7;
+  }
+
+  .proj__cols {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+  }
+
+  @media (min-width: 900px) {
+    .proj__cols {
+      grid-template-columns: 1.6fr 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  .proj__prose {
+    max-width: 62ch;
+  }
+
+  .proj__prose :global(h2) {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .proj__prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .proj__prose :global(p) {
+    margin-bottom: var(--space-2);
+  }
+
+  .proj__prose :global(em) {
+    color: var(--color-accent);
+    font-style: normal;
+  }
+
+  .proj__asideTitle {
+    opacity: 0.6;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .proj__stackItem {
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--hairline);
+    font-size: 0.85rem;
+  }
+
+  .proj__pager {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-8);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--hairline);
+  }
+
+  @media (min-width: 720px) {
+    .proj__pager {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .proj__pagerLink {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+    padding: var(--space-3);
+    border: 1px solid var(--hairline);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .proj__pagerLink:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .proj__pagerLink--next {
+    text-align: right;
+  }
+
+  .proj__pagerName {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    line-height: 1.2;
+  }
+</style>

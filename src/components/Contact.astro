@@ -1,0 +1,102 @@
+---
+import { site } from "../site";
+
+const rows = [
+  { label: "Email", value: site.email, href: `mailto:${site.email}` },
+  { label: "Phone", value: site.phone, href: `tel:${site.phone.replace(/[^+\d]/g, "")}` },
+  { label: "GitHub", value: "github.com/Ahmad-Zia10", href: site.github },
+  { label: "LinkedIn", value: "linkedin.com/in/ahmad-zia", href: site.linkedin },
+];
+---
+
+<section class="contact" id="contact" aria-labelledby="contact-h">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display" id="contact-h">
+        <span class="section-head__clip"><span data-section-word>Say hi</span></span>
+      </h2>
+      <span class="section-head__code">06-01-00 / open to work</span>
+    </div>
+
+    <div class="contact__grid" data-reveal-group>
+      <div class="contact__pitch" data-reveal>
+        <p class="contact__lede">
+          Building something that needs an agent to actually do the work? I'd
+          like to hear about it.
+        </p>
+        <a class="pill contact__cta" href={site.calendly} target="_blank" rel="noopener">
+          [Book a call]
+        </a>
+      </div>
+
+      <ul class="contact__list" data-reveal>
+        {
+          rows.map((r) => (
+            <li class="contact__row">
+              <a class="contact__link" href={r.href}>
+                <span class="label contact__label">{r.label}</span>
+                <span class="contact__value">{r.value}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-bottom: var(--space-8);
+  }
+
+  .contact__grid {
+    display: grid;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  @media (min-width: 900px) {
+    .contact__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  .contact__lede {
+    font-size: var(--fs-h3);
+    line-height: 1.4;
+    max-width: 30ch;
+  }
+
+  .contact__cta {
+    margin-top: var(--space-3);
+  }
+
+  .contact__row {
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .contact__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    padding-block: var(--space-3);
+    min-height: 44px;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .contact__link:hover {
+    color: var(--color-accent);
+  }
+
+  .contact__label {
+    opacity: 0.6;
+  }
+
+  .contact__value {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    word-break: break-word;
+  }
+</style>

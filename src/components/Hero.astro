@@ -1,0 +1,158 @@
+---
+import { site } from "../site";
+---
+
+<section class="hero" aria-labelledby="hero-h">
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <p class="label hero__kicker">
+        {site.role} · {site.location}
+      </p>
+      <h1 class="display hero__title" id="hero-h">
+        Hey<span class="hero__punct">!</span>
+      </h1>
+      <p class="hero__lede">
+        I'm {site.name}. I build AI agents that finish the job — systems that
+        complete a transaction, cite their sources, and answer the phone in
+        under a second.
+      </p>
+      <div class="hero__actions">
+        <a class="pill" href="#work">See the work</a>
+        <a class="pill pill--ghost" href="#contact">Get in touch</a>
+      </div>
+    </div>
+
+    <div class="hero__scene" data-hero-scene aria-hidden="true">
+      <svg viewBox="0 0 520 520" class="hero__svg">
+        <!-- back: concentric signal rings -->
+        <g data-depth="0.25" opacity="0.5">
+          <circle cx="300" cy="250" r="235" fill="none" stroke="var(--illus-deep)" stroke-width="1.5"></circle>
+          <circle cx="300" cy="250" r="185" fill="none" stroke="var(--illus-deep)" stroke-width="1.5"></circle>
+          <circle cx="300" cy="250" r="135" fill="none" stroke="var(--illus-deep)" stroke-width="1.5"></circle>
+        </g>
+
+        <!-- mid: the disc -->
+        <g data-depth="0.55">
+          <circle cx="300" cy="250" r="118" fill="var(--color-ink)"></circle>
+          <path
+            d="M228 250a72 72 0 0 1 144 0"
+            fill="none"
+            stroke="var(--color-accent)"
+            stroke-width="3"
+            stroke-linecap="round"></path>
+        </g>
+
+        <!-- waveform -->
+        <g data-depth="0.8" stroke="var(--color-paper)" stroke-width="7" stroke-linecap="round">
+          <path d="M252 250v-34"></path>
+          <path d="M274 250v-62"></path>
+          <path d="M296 250v-88"></path>
+          <path d="M318 250v-54"></path>
+          <path d="M340 250v-26"></path>
+        </g>
+
+        <!-- front: spec marks -->
+        <g data-depth="1.1">
+          <rect x="96" y="92" width="58" height="58" fill="none" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <path d="M120 404h84" stroke="var(--color-paper)" stroke-width="2"></path>
+          <path d="M120 396v16M204 396v16" stroke="var(--color-paper)" stroke-width="2"></path>
+          <path d="M424 150l26 26-26 26" fill="none" stroke="var(--color-paper)" stroke-width="2"></path>
+          <circle cx="430" cy="396" r="9" fill="var(--color-accent)"></circle>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="hero__ticker">
+    <span class="label">Scroll</span>
+    <span class="hero__rule" aria-hidden="true"></span>
+    <span class="label">01 — Work</span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: var(--nav-h);
+  }
+
+  .hero__inner {
+    flex: 1;
+    display: grid;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: var(--space-6) var(--gutter) var(--space-4);
+  }
+
+  .hero__kicker {
+    opacity: 0.8;
+  }
+
+  .hero__title {
+    margin-block: var(--space-2) var(--space-3);
+  }
+
+  .hero__punct {
+    color: var(--color-accent);
+  }
+
+  .hero__lede {
+    max-width: 44ch;
+    font-size: var(--fs-h3);
+    line-height: 1.45;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .hero__scene {
+    order: -1;
+    justify-self: center;
+    width: min(78vw, 22rem);
+  }
+
+  .hero__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .hero__ticker {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: var(--maxw);
+    width: 100%;
+    margin-inline: auto;
+    padding: var(--space-2) var(--gutter) var(--space-4);
+    opacity: 0.8;
+  }
+
+  .hero__rule {
+    flex: 1;
+    height: 1px;
+    background: var(--hairline);
+  }
+
+  @media (min-width: 900px) {
+    .hero__inner {
+      grid-template-columns: 1.1fr 1fr;
+      gap: var(--space-8);
+    }
+
+    .hero__scene {
+      order: 0;
+      width: min(42vw, 34rem);
+    }
+  }
+</style>

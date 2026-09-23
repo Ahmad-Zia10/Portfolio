@@ -1,0 +1,64 @@
+---
+import { getCollection } from "astro:content";
+import ServiceCard from "./ServiceCard.astro";
+
+const entries = (await getCollection("services")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+// The markdown body is one short paragraph — render to plain text for the card.
+const services = await Promise.all(
+  entries.map(async (e) => ({
+    data: e.data,
+    body: (e.body ?? "").replace(/\s+/g, " ").trim(),
+  })),
+);
+---
+
+<section class="services" id="services" aria-labelledby="services-h">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display" id="services-h">
+        <span class="section-head__clip"><span data-section-word>What I do</span></span>
+      </h2>
+      <span class="section-head__code">03-06-04 / {services.length} domains</span>
+    </div>
+
+    <div class="services__grid" data-reveal-group>
+      {
+        services.map((s) => (
+          <ServiceCard
+            code={s.data.code}
+            abbr={s.data.abbr}
+            name={s.data.name}
+            skills={s.data.skills}
+            from={s.data.from}
+            to={s.data.to}
+            body={s.body}
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .services__grid {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 720px) {
+    .services__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .services__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

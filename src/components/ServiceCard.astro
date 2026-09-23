@@ -1,0 +1,124 @@
+---
+import Tag from "./Tag.astro";
+
+interface Props {
+  code: string;
+  abbr: string;
+  name: string;
+  skills: readonly string[];
+  from: string;
+  to: string;
+  body: string;
+}
+
+const { code, abbr, name, skills, from, to, body } = Astro.props;
+---
+
+<article class="svc" data-reveal>
+  <div class="svc__top">
+    <span class="label svc__code">{code}</span>
+    <span class="label svc__kind">Service</span>
+  </div>
+
+  <p class="svc__abbr">{abbr}</p>
+  <h3 class="svc__name">{name}</h3>
+  <p class="svc__body">{body}</p>
+
+  <ul class="svc__skills">
+    {
+      skills.map((s, i) => (
+        <li>
+          <Tag label={s} dir={i % 2 === 0 ? "up" : "down"} />
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="svc__spectrum">
+    <span class="svc__node">{from}</span>
+    <svg class="svc__arrow" viewBox="0 0 120 10" aria-hidden="true">
+      <path d="M0 5h113" stroke="currentColor" stroke-width="1.25" fill="none"></path>
+      <path d="M108 1l5 4-5 4" stroke="currentColor" stroke-width="1.25" fill="none"></path>
+    </svg>
+    <span class="svc__node">{to}</span>
+  </div>
+</article>
+
+<style>
+  .svc {
+    --card-accent: var(--color-accent);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--surface);
+    color: var(--surface-fg);
+    border: 1px solid var(--hairline-ink);
+    padding: var(--space-3);
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .svc:hover {
+    border-color: var(--color-accent);
+  }
+
+  .svc__top {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    opacity: 0.5;
+  }
+
+  .svc__abbr {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-accent);
+    margin-top: var(--space-3);
+  }
+
+  .svc__name {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    line-height: 1.2;
+    margin-top: var(--space-1);
+  }
+
+  .svc__body {
+    margin-top: var(--space-2);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.85;
+    flex: 1;
+  }
+
+  .svc__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.9rem;
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+  }
+
+  .svc__spectrum {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+  }
+
+  .svc__node {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    font-weight: var(--weight-bold);
+  }
+
+  .svc__arrow {
+    flex: 1;
+    height: 10px;
+    opacity: 0.7;
+  }
+</style>

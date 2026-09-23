@@ -1,0 +1,214 @@
+---
+import { site, nav } from "../site";
+---
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="/" aria-label={`${site.name} — home`}>
+      <svg viewBox="0 0 64 32" width="64" height="32" aria-hidden="true">
+        <rect width="64" height="32" fill="currentColor"></rect>
+        <path
+          d="M10 24 16 8l6 16M12.4 18.4h7.2"
+          stroke="var(--color-brand)"
+          stroke-width="2.4"
+          stroke-linecap="square"
+          fill="none"></path>
+        <path
+          d="M28 8h12l-12 16h12"
+          stroke="var(--color-brand)"
+          stroke-width="2.4"
+          stroke-linecap="square"
+          fill="none"></path>
+        <path
+          d="M48 19v-6M52 22v-12M56 17.5v-3"
+          stroke="var(--color-brand)"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          fill="none"></path>
+      </svg>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <ul>
+        {
+          nav.map((l) => (
+            <li>
+              <a class="nav__link" href={l.href}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a class="pill nav__cta" href={site.calendly} target="_blank" rel="noopener">
+      [Let's talk]
+    </a>
+
+    <button
+      class="nav__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="nav-overlay"
+      data-nav-toggle
+    >
+      <span data-nav-label>Menu</span>
+    </button>
+  </div>
+
+  <div class="nav__overlay" id="nav-overlay" hidden data-nav-overlay>
+    <nav aria-label="Mobile">
+      <ul>
+        {
+          nav.map((l) => (
+            <li>
+              <a class="nav__overlayLink" href={l.href} data-nav-close>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a
+            class="nav__overlayLink nav__overlayLink--cta"
+            href={site.calendly}
+            target="_blank"
+            rel="noopener"
+          >
+            [Let's talk]
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--nav-h);
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .nav__logo {
+    display: flex;
+    color: var(--color-ink);
+    flex: none;
+  }
+
+  .nav__logo svg {
+    width: 3.5rem;
+    height: auto;
+  }
+
+  .nav__links {
+    margin-left: auto;
+  }
+
+  .nav__links ul {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .nav__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  .nav__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0.7rem;
+    width: 100%;
+    height: 1px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .nav__link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .nav__toggle {
+    display: none;
+    margin-left: auto;
+    min-height: 44px;
+    min-width: 44px;
+    padding-inline: var(--space-2);
+    background: transparent;
+    border: 1px solid var(--color-paper);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .nav__overlay {
+    position: fixed;
+    inset: var(--nav-h) 0 0;
+    background: var(--bg);
+    padding: var(--space-4) var(--gutter);
+    overflow-y: auto;
+  }
+
+  .nav__overlay[hidden] {
+    display: none;
+  }
+
+  .nav__overlayLink {
+    display: block;
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--hairline);
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .nav__overlayLink--cta {
+    color: var(--color-accent);
+    border-bottom: 0;
+  }
+
+  @media (max-width: 860px) {
+    .nav__links,
+    .nav__cta {
+      display: none;
+    }
+
+    .nav__toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  @media (min-width: 861px) {
+    .nav__overlay {
+      display: none;
+    }
+  }
+</style>
+

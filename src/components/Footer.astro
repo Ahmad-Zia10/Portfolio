@@ -1,0 +1,51 @@
+---
+import { site } from "../site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="shell foot__inner">
+    <p class="label">© {year} {site.name}</p>
+    <ul class="foot__links">
+      <li><a class="foot__link" href={site.github} target="_blank" rel="noopener">GitHub</a></li>
+      <li><a class="foot__link" href={site.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a class="foot__link" href="/lab">Lab</a></li>
+    </ul>
+    <a class="foot__link foot__top" href="#main">Back to top ↑</a>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .foot__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .foot__links {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .foot__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .foot__link:hover {
+    color: var(--color-accent);
+  }
+</style>

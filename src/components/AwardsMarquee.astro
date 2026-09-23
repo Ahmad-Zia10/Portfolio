@@ -1,0 +1,92 @@
+---
+import { credentials } from "../site";
+---
+
+<div class="marquee" data-marquee>
+  <!-- Track duplicated for a seamless loop; the copy is hidden from AT. -->
+  <ul class="marquee__track">
+    {
+      credentials.map((c) => (
+        <li class="marquee__item">
+          <span class="marquee__dot" aria-hidden="true">
+            ▲
+          </span>
+          {c}
+        </li>
+      ))
+    }
+  </ul>
+  <ul class="marquee__track" aria-hidden="true">
+    {
+      credentials.map((c) => (
+        <li class="marquee__item">
+          <span class="marquee__dot">▲</span>
+          {c}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .marquee {
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+    border-block: 1px solid var(--hairline);
+    padding-block: var(--space-2);
+    /* Fallback for no-JS: CSS-driven scroll. */
+    --marquee-dur: 45s;
+  }
+
+  .marquee__track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-4);
+    padding-right: var(--space-4);
+    animation: scroll var(--marquee-dur) linear infinite;
+  }
+
+  .marquee:hover .marquee__track,
+  .marquee:focus-within .marquee__track {
+    animation-play-state: paused;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    white-space: nowrap;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+  }
+
+  .marquee__dot {
+    font-size: 0.6em;
+    color: var(--color-accent);
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* Reduced motion: stop the loop and let the list wrap into place. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow: visible;
+    }
+
+    .marquee__track {
+      animation: none;
+      flex-wrap: wrap;
+      gap: var(--space-2) var(--space-4);
+    }
+
+    .marquee__track[aria-hidden="true"] {
+      display: none;
+    }
+  }
+</style>
