@@ -48,8 +48,8 @@ import { site } from "../site";
         <img
           class="portrait__img portrait__img--sharp"
           src="/images/portrait/portrait-atkinson.webp"
-          width="470"
-          height="652"
+          width="627"
+          height="870"
           alt="Portrait of Ahmad Zia"
           loading="eager"
           fetchpriority="high"
@@ -58,8 +58,8 @@ import { site } from "../site";
         <img
           class="portrait__img portrait__img--coarse"
           src="/images/portrait/portrait-atkinson-coarse.webp"
-          width="470"
-          height="652"
+          width="627"
+          height="870"
           alt=""
           aria-hidden="true"
           loading="eager"
@@ -157,8 +157,8 @@ import { site } from "../site";
   .portrait {
     position: relative;
     display: block;
-    width: 470px;
-    height: 652px;
+    width: 627px;
+    height: 870px;
     max-width: 100%;
     /* Isolates layout/paint of the stacked images from the rest of the page. */
     contain: layout paint;
@@ -347,14 +347,21 @@ import { site } from "../site";
       margin-bottom: 0;
     }
 
-    /* Spec size is 470x652 (half the 940x1304 source), so the dither maps
-       2 device px per source px. On viewports too short for that, scale the
-       whole portrait down rather than cropping the face off — width and
-       height shrink together so the pixel grid stays square. */
+    /* 627x870 is two thirds of the 940x1304 source, so three source pixels
+       map to two CSS pixels and the dither grid stays regular. It needs a
+       viewport around 1056px tall to render at full size; below that the whole
+       portrait scales down proportionally rather than cropping the face, so
+       the pixel grid stays square either way. */
     .portrait {
-      --portrait-h: min(652px, calc(100svh - var(--nav-h) - 8.5rem));
+      /* Height-led, but also capped by width so the portrait yields on
+         narrower desktops instead of squeezing the copy. */
+      --portrait-h: min(
+        870px,
+        calc(100svh - var(--nav-h) - 8.5rem),
+        calc(38vw * (870 / 627))
+      );
       height: var(--portrait-h);
-      width: calc(var(--portrait-h) * (470 / 652));
+      width: calc(var(--portrait-h) * (627 / 870));
     }
   }
 
