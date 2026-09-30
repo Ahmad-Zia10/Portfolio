@@ -12,6 +12,7 @@
 export function initUI() {
   setupNav();
   setupCarousel();
+  setupPortrait();
 }
 
 /**
@@ -26,6 +27,27 @@ function claim(el: Element, key: string) {
   if ((el as HTMLElement).dataset[flag] === "1") return false;
   (el as HTMLElement).dataset[flag] = "1";
   return true;
+}
+
+/**
+ * Hero portrait sharpen.
+ *
+ * On pointer devices the effect is pure CSS (:hover). Touch devices have no
+ * hover, so the sharpen plays once shortly after load instead — otherwise the
+ * portrait would stay permanently coarse there.
+ */
+function setupPortrait() {
+  const portrait = document.querySelector<HTMLElement>("[data-portrait]");
+  if (!portrait) return;
+  if (!claim(portrait, "Portrait")) return;
+
+  const canHover = window.matchMedia("(hover: hover)").matches;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (canHover || reduced) return;
+
+  window.setTimeout(() => {
+    portrait.dataset.sharpen = "";
+  }, 400);
 }
 
 function setupNav() {

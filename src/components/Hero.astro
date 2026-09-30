@@ -22,44 +22,52 @@ import { site } from "../site";
       </div>
     </div>
 
-    <div class="hero__scene" data-hero-scene aria-hidden="true">
-      <svg viewBox="0 0 520 520" class="hero__svg">
-        <!-- back: concentric signal rings -->
-        <g data-depth="0.25" opacity="0.5">
-          <circle cx="300" cy="250" r="235" fill="none" stroke="var(--illus-deep)" stroke-width="1.5"></circle>
-          <circle cx="300" cy="250" r="185" fill="none" stroke="var(--illus-deep)" stroke-width="1.5"></circle>
-          <circle cx="300" cy="250" r="135" fill="none" stroke="var(--illus-deep)" stroke-width="1.5"></circle>
+    <div class="hero__scene" data-hero-scene>
+      <!-- Decorative spec marks sit behind the portrait: concentric rings,
+           the outlined square, and the accent dot. -->
+      <svg
+        class="hero__marks"
+        viewBox="0 0 640 760"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <!-- Rings are drawn as ellipses because the box is stretched. -->
+        <g opacity="0.5" stroke="var(--illus-deep)" stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke">
+          <ellipse cx="330" cy="330" rx="290" ry="300"></ellipse>
+          <ellipse cx="330" cy="330" rx="243" ry="252"></ellipse>
         </g>
-
-        <!-- mid: the disc -->
-        <g data-depth="0.55">
-          <circle cx="300" cy="250" r="118" fill="var(--color-ink)"></circle>
-          <path
-            d="M228 250a72 72 0 0 1 144 0"
-            fill="none"
-            stroke="var(--color-accent)"
-            stroke-width="3"
-            stroke-linecap="round"></path>
-        </g>
-
-        <!-- waveform -->
-        <g data-depth="0.8" stroke="var(--color-paper)" stroke-width="7" stroke-linecap="round">
-          <path d="M252 250v-34"></path>
-          <path d="M274 250v-62"></path>
-          <path d="M296 250v-88"></path>
-          <path d="M318 250v-54"></path>
-          <path d="M340 250v-26"></path>
-        </g>
-
-        <!-- front: spec marks -->
-        <g data-depth="1.1">
-          <rect x="96" y="92" width="58" height="58" fill="none" stroke="var(--color-accent)" stroke-width="2"></rect>
-          <path d="M120 404h84" stroke="var(--color-paper)" stroke-width="2"></path>
-          <path d="M120 396v16M204 396v16" stroke="var(--color-paper)" stroke-width="2"></path>
-          <path d="M424 150l26 26-26 26" fill="none" stroke="var(--color-paper)" stroke-width="2"></path>
-          <circle cx="430" cy="396" r="9" fill="var(--color-accent)"></circle>
-        </g>
+        <rect
+          x="36" y="112" width="62" height="66"
+          fill="none" stroke="var(--color-accent)" stroke-width="2"
+          vector-effect="non-scaling-stroke"></rect>
+        <ellipse cx="614" cy="352" rx="9" ry="9" fill="var(--color-accent)"></ellipse>
       </svg>
+
+      <div class="portrait" data-portrait>
+        <img
+          class="portrait__img portrait__img--sharp"
+          src="/images/portrait/portrait-atkinson.webp"
+          width="470"
+          height="652"
+          alt="Portrait of Ahmad Zia"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+        <img
+          class="portrait__img portrait__img--coarse"
+          src="/images/portrait/portrait-atkinson-coarse.webp"
+          width="470"
+          height="652"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <p class="hero__badge">AZ · Open to work</p>
     </div>
   </div>
 
@@ -77,6 +85,9 @@ import { site } from "../site";
     flex-direction: column;
     justify-content: center;
     padding-top: var(--nav-h);
+    /* The portrait is clipped by the hero's bottom edge rather than
+       overflowing into the Work section below it. */
+    overflow: hidden;
   }
 
   .hero__inner {
@@ -88,6 +99,7 @@ import { site } from "../site";
     max-width: var(--maxw);
     margin-inline: auto;
     padding: var(--space-6) var(--gutter) var(--space-4);
+    min-height: 0;
   }
 
   .hero__kicker {
@@ -115,16 +127,89 @@ import { site } from "../site";
     margin-top: var(--space-4);
   }
 
+  /* ---- Portrait scene ---- */
   .hero__scene {
-    order: -1;
+    position: relative;
     justify-self: center;
-    width: min(78vw, 22rem);
+    align-self: end;
+    /* Cancels the grid's bottom padding so the portrait sits flush on the
+       hero's bottom edge. */
+    margin-bottom: calc(var(--space-4) * -1);
+    line-height: 0;
   }
 
-  .hero__svg {
-    width: 100%;
+  .hero__marks {
+    position: absolute;
+    /* Anchored to the portrait box and inflated around it, so the rings,
+       square and dot keep their relationship to the face at any scale. */
+    left: -18%;
+    right: -14%;
+    bottom: -6%;
+    top: -8%;
+    width: auto;
     height: auto;
     overflow: visible;
+    pointer-events: none;
+  }
+
+  .portrait {
+    position: relative;
+    display: block;
+    width: 470px;
+    height: 652px;
+    max-width: 100%;
+    /* Isolates layout/paint of the stacked images from the rest of the page. */
+    contain: layout paint;
+  }
+
+  .portrait__img {
+    /* Both layers occupy the same box so the dither grids register exactly;
+       the two source files differ by 4px in width. */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    /* Nearest-neighbour: the dither must stay crisp, never resampled. */
+    image-rendering: pixelated;
+  }
+
+  .portrait__img--coarse {
+    opacity: 1;
+    transition: opacity 0.6s steps(5);
+    /* Promote to its own compositor layer: two stacked pixelated images at
+       DPR 2 are costly to re-rasterise, and without this the opacity
+       transition repaints them both on every frame. */
+    will-change: opacity;
+    transform: translateZ(0);
+  }
+
+  /* Hover sharpens the portrait in chunky steps. */
+  @media (hover: hover) {
+    .portrait:hover .portrait__img--coarse {
+      opacity: 0;
+    }
+  }
+
+  /* One-shot sharpen for touch devices, triggered on load. */
+  .portrait[data-sharpen] .portrait__img--coarse {
+    opacity: 0;
+  }
+
+  .hero__badge {
+    position: absolute;
+    right: 0;
+    bottom: var(--space-4);
+    z-index: 2;
+    padding: 0.5em 0.9em;
+    background: var(--color-ink);
+    color: var(--color-accent);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1.4;
+    white-space: nowrap;
   }
 
   .hero__ticker {
@@ -144,15 +229,122 @@ import { site } from "../site";
     background: var(--hairline);
   }
 
-  @media (min-width: 900px) {
+  /* Reduced motion: no sharpen at all, just the sharp image. */
+  @media (prefers-reduced-motion: reduce) {
+    .portrait__img--coarse {
+      display: none;
+    }
+  }
+
+  /* ---- Mobile: portrait below the copy, bottom-anchored ---- */
+  @media (max-width: 768px) {
     .hero__inner {
-      grid-template-columns: 1.1fr 1fr;
-      gap: var(--space-8);
+      /* Tightened so the copy, buttons and portrait all fit one screen.
+         The copy takes what it needs; the portrait row absorbs the rest,
+         which keeps the hero exactly one viewport tall however the copy
+         reflows. */
+      padding-top: var(--space-3);
+      padding-bottom: 0;
+      gap: var(--space-2);
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .hero__copy {
+      order: -1;
+    }
+
+    .hero__title {
+      margin-block: var(--space-1) var(--space-2);
+    }
+
+    .hero__lede {
+      font-size: var(--fs-body);
+      line-height: 1.4;
+    }
+
+    .hero__actions {
+      margin-top: var(--space-3);
+    }
+
+    /* Short phones: trade copy spacing for portrait height. */
+    @media (max-height: 700px) {
+      .hero__lede {
+        font-size: 0.875rem;
+      }
+
+      .hero__actions {
+        margin-top: var(--space-2);
+      }
     }
 
     .hero__scene {
-      order: 0;
-      width: min(42vw, 34rem);
+      margin-bottom: 0;
+      /* Fills the 1fr row so the portrait can measure against it. */
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .portrait {
+      /* At 300px wide the full portrait is 416px tall, which pushes the hero
+         past one screen once the copy is stacked above it. Cropping the lower
+         part keeps the face whole and the bottom edge flush. The floor stops
+         very short viewports from cropping into the face. */
+      width: 300px;
+      /* Whatever vertical space the copy, nav and ticker leave over. The grid
+         row is already sized by `align-content: space-between`, so 100% here
+         means "fill the remaining track" and the hero always ends up exactly
+         one viewport tall, whatever the copy reflows to. */
+      height: 100%;
+      max-height: 380px;
+    }
+
+    .hero__badge {
+      bottom: var(--space-2);
+      font-size: 0.625rem;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .hero__inner {
+      grid-template-columns: 1.05fr auto;
+      gap: var(--space-6);
+      align-items: end;
+      /* No bottom padding: the portrait's own edge is the hero's edge. */
+      padding-bottom: 0;
+    }
+
+    .hero__copy {
+      align-self: center;
+      /* Keeps the copy clear of the ticker that follows. */
+      padding-bottom: var(--space-6);
+    }
+
+    .hero__scene {
+      justify-self: end;
+      margin-bottom: 0;
+    }
+
+    /* Spec size is 470x652 (half the 940x1304 source), so the dither maps
+       2 device px per source px. On viewports too short for that, scale the
+       whole portrait down rather than cropping the face off — width and
+       height shrink together so the pixel grid stays square. */
+    .portrait {
+      --portrait-h: min(652px, calc(100svh - var(--nav-h) - 8.5rem));
+      height: var(--portrait-h);
+      width: calc(var(--portrait-h) * (470 / 652));
+    }
+  }
+
+  /* Below the two-column breakpoint the portrait would crowd the copy. */
+  @media (max-width: 899px) {
+    .hero__inner {
+      justify-items: center;
+    }
+
+    .hero__copy {
+      text-align: left;
     }
   }
 </style>

@@ -145,18 +145,20 @@ function heroParallax(gsap: typeof import("gsap").gsap) {
   const scene = document.querySelector("[data-hero-scene]");
   if (!scene) return;
 
-  scene.querySelectorAll<SVGElement>("[data-depth]").forEach((layer) => {
-    const depth = Number(layer.dataset.depth ?? 0);
-    gsap.to(layer, {
-      yPercent: depth * 18,
-      ease: "none",
-      scrollTrigger: {
-        trigger: scene,
-        start: "top top",
-        end: "bottom top",
-        scrub: 0.6,
-      },
-    });
+  // The decorative marks drift faster than the portrait, which stays put:
+  // the portrait is bottom-anchored, so moving it would break that alignment.
+  const marks = scene.querySelector(".hero__marks");
+  if (!marks) return;
+
+  gsap.to(marks, {
+    yPercent: 12,
+    ease: "none",
+    scrollTrigger: {
+      trigger: scene,
+      start: "top top",
+      end: "bottom top",
+      scrub: 0.6,
+    },
   });
 }
 
