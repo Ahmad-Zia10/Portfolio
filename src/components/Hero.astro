@@ -115,6 +115,8 @@ import { site } from "../site";
   }
 
   .hero__lede {
+    /* Line length is set by the grid column on desktop (see .hero__inner);
+       this cap is the single-column fallback below that breakpoint. */
     max-width: 44ch;
     font-size: var(--fs-h3);
     line-height: 1.45;
@@ -308,8 +310,26 @@ import { site } from "../site";
 
   @media (min-width: 900px) {
     .hero__inner {
-      grid-template-columns: 1.05fr auto;
-      gap: var(--space-6);
+      /* The copy column is capped rather than greedy: left to fill the space
+         it ran to ~790px (about 62 characters a line), which read long and
+         made the 470px portrait look like an afterthought beside it. The
+         leftover width becomes breathing room between the two columns. */
+      /* The copy stays on the page gutter so it lines up with the wordmark and
+         every section below. The middle column soaks up leftover width, which
+         keeps the portrait near the copy instead of stranded in the corner on
+         very wide screens. */
+      /* Three columns: capped copy, a spacer that absorbs slack, and the
+         portrait on the right gutter.
+         The copy cap is what balances the two sides. Uncapped it ran to
+         ~790px (about 62 characters a line), which read long and left the
+         470px portrait looking like an afterthought. The spacer is capped too,
+         so the pair never drifts apart on wide screens. */
+      grid-template-columns:
+        minmax(0, 42rem)
+        minmax(var(--space-4), 8rem)
+        auto;
+      gap: 0;
+      justify-content: space-between;
       align-items: end;
       /* No bottom padding: the portrait's own edge is the hero's edge. */
       padding-bottom: 0;
@@ -322,6 +342,7 @@ import { site } from "../site";
     }
 
     .hero__scene {
+      grid-column: 3;
       justify-self: end;
       margin-bottom: 0;
     }
