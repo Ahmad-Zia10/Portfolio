@@ -2,6 +2,7 @@
 code: "GEO"
 client: "GIT Software Technologies"
 name: "Ride-Hailing & Parcel Platform"
+shortName: "Ride-Hailing & Parcel"
 year: "2025"
 tags: ["POSTGIS", "REDIS", "NODE.JS", "LEDGER", "CI/CD"]
 summary: "Backend services for an all-India ride-hailing and parcel platform — geospatial driver matching and a double-entry ledger for payouts."

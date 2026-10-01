@@ -1,0 +1,120 @@
+---
+/**
+ * GEO tile artwork: a street grid with a dispatch route.
+ *
+ * A dashed route runs from pickup to drop-off. On hover a yellow marker
+ * travels it using CSS `offset-path`, which the compositor can animate without
+ * touching layout.
+ *
+ * The route geometry is declared once in a custom property so the SVG path and
+ * the marker's offset-path can never drift apart.
+ */
+---
+
+<div class="route">
+  <svg
+    class="route__svg"
+    viewBox="0 0 320 180"
+    preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Street grid -->
+    <g class="route__grid">
+      <path d="M0 36H320M0 72H320M0 108H320M0 144H320" />
+      <path d="M48 0V180M104 0V180M160 0V180M216 0V180M272 0V180" />
+    </g>
+
+    <!-- The dispatch route -->
+    <path
+      class="route__line"
+      d="M40 148 L104 148 L104 108 L160 108 L160 72 L216 72 L216 32 L284 32"
+      fill="none"
+    />
+
+    <!-- Endpoints -->
+    <rect class="route__pin" x="33" y="141" width="14" height="14" />
+    <rect class="route__pin route__pin--end" x="277" y="25" width="14" height="14" />
+
+    <!-- Travelling marker. Inside the SVG so it shares the viewBox's
+         coordinate space and cannot drift from the route when the tile
+         scales. -->
+    <rect class="route__marker" x="-5" y="-5" width="10" height="10" />
+  </svg>
+</div>
+
+<style>
+  .route {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(10, 10, 10, 0.4) 1px, transparent 1px);
+    background-size: 6px 6px;
+  }
+
+  .route__svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .route__grid path {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1;
+    opacity: 0.3;
+  }
+
+  .route__line {
+    stroke: var(--color-ink);
+    stroke-width: 2.5;
+    stroke-dasharray: 7 5;
+    stroke-linecap: square;
+  }
+
+  .route__pin {
+    fill: var(--color-ink);
+  }
+
+  .route__pin--end {
+    fill: var(--color-accent);
+  }
+
+  /* The travelling marker rides the same path the route is drawn from, in the
+     SVG's own coordinate space, so the two stay aligned at any tile size. */
+  .route__marker {
+    fill: var(--color-accent);
+    opacity: 0;
+    /* Must stay identical to .route__line's `d`, or marker and route drift. */
+    offset-path: path(
+      "M40 148 L104 148 L104 108 L160 108 L160 72 L216 72 L216 32 L284 32"
+    );
+    offset-distance: 0%;
+    offset-rotate: 0deg;
+    transition: opacity 0.2s var(--ease-out);
+  }
+
+  :global(.tile:hover) .route__marker,
+  :global(.tile:focus-within) .route__marker {
+    opacity: 1;
+    animation: route-travel 1.8s var(--ease-out) infinite;
+  }
+
+  @keyframes route-travel {
+    from {
+      offset-distance: 0%;
+    }
+    to {
+      offset-distance: 100%;
+    }
+  }
+
+  /* Reduced motion: marker parked at the destination, no travel. */
+  @media (prefers-reduced-motion: reduce) {
+    .route__marker {
+      opacity: 1;
+      offset-distance: 100%;
+      animation: none;
+      transition: none;
+    }
+  }
+</style>

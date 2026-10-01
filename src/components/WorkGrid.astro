@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 import WorkTile from "./WorkTile.astro";
+import DocGraph from "./media/DocGraph.astro";
+import GeoRoute from "./media/GeoRoute.astro";
 
 const projects = (await getCollection("projects")).sort(
   (a, b) => a.data.order - b.data.order,
@@ -33,7 +35,7 @@ const indexOf = (code: string) =>
         feature
         code={vox.data.code}
         client={vox.data.client}
-        name={vox.data.name}
+        name={vox.data.shortName ?? vox.data.name}
         year={vox.data.year}
         tagline={vox.data.tagline}
         stack={vox.data.tags}
@@ -46,19 +48,21 @@ const indexOf = (code: string) =>
         area="doc"
         code={doc.data.code}
         client={doc.data.client}
-        name={doc.data.name}
+        name={doc.data.shortName ?? doc.data.name}
         year={doc.data.year}
         tagline={doc.data.tagline}
         slug={doc.id}
         index={indexOf("DOC")}
         total={total}
-      />
+      >
+        <DocGraph slot="media" />
+      </WorkTile>
 
       <WorkTile
         area="mnt"
         code={mnt.data.code}
         client={mnt.data.client}
-        name={mnt.data.name}
+        name={mnt.data.shortName ?? mnt.data.name}
         year={mnt.data.year}
         tagline={mnt.data.tagline}
         slug={mnt.id}
@@ -70,20 +74,22 @@ const indexOf = (code: string) =>
         area="geo"
         code={geo.data.code}
         client={geo.data.client}
-        name={geo.data.name}
+        name={geo.data.shortName ?? geo.data.name}
         year={geo.data.year}
         tagline={geo.data.tagline}
         slug={geo.id}
         index={indexOf("GEO")}
         total={total}
-      />
+      >
+        <GeoRoute slot="media" />
+      </WorkTile>
 
       <WorkTile
         area="lrn"
         side
         code={lrn.data.code}
         client={lrn.data.client}
-        name={lrn.data.name}
+        name={lrn.data.shortName ?? lrn.data.name}
         year={lrn.data.year}
         tagline={lrn.data.tagline}
         slug={lrn.id}

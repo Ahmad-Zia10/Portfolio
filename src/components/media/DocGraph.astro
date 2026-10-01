@@ -1,0 +1,158 @@
+---
+/**
+ * DOC tile artwork: a knowledge graph.
+ *
+ * Ten ink nodes scattered on the brand blue. On hover a five-node path draws
+ * itself in yellow via stroke-dashoffset and a "CITE ↗" label fades in — the
+ * multi-hop retrieval the project is actually about.
+ *
+ * Pure CSS: no JS, and the whole thing is inert under reduced motion.
+ */
+---
+
+<div class="graph">
+  <svg
+    class="graph__svg"
+    viewBox="0 0 640 180"
+    preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Background mesh: every edge, drawn faintly. -->
+    <g class="graph__mesh">
+      <path d="M44 128 L128 74 L214 118 L300 52 L386 96 L472 40 L548 88 L610 36" />
+      <path d="M128 74 L170 150 L300 52" />
+      <path d="M214 118 L262 162 L386 96" />
+      <path d="M472 40 L512 140 L610 36" />
+      <path d="M44 128 L170 150 L262 162 L512 140" />
+    </g>
+
+    <!-- The multi-hop answer path, drawn on hover. -->
+    <path
+      class="graph__path"
+      d="M44 128 L128 74 L300 52 L472 40 L610 36"
+      fill="none"
+      pathLength="1"
+    />
+
+    <g class="graph__nodes">
+      <circle cx="44" cy="128" r="6" />
+      <circle cx="128" cy="74" r="6" />
+      <circle cx="170" cy="150" r="5" />
+      <circle cx="214" cy="118" r="5" />
+      <circle cx="262" cy="162" r="5" />
+      <circle cx="300" cy="52" r="6" />
+      <circle cx="386" cy="96" r="5" />
+      <circle cx="472" cy="40" r="6" />
+      <circle cx="512" cy="140" r="5" />
+      <circle cx="548" cy="88" r="5" />
+      <circle cx="610" cy="36" r="6" />
+    </g>
+
+    <!-- Nodes on the path, highlighted. -->
+    <g class="graph__hops">
+      <circle cx="44" cy="128" r="6" />
+      <circle cx="128" cy="74" r="6" />
+      <circle cx="300" cy="52" r="6" />
+      <circle cx="472" cy="40" r="6" />
+      <circle cx="610" cy="36" r="6" />
+    </g>
+
+    <g class="graph__cite">
+      <rect x="548" y="52" width="76" height="20" />
+      <text x="586" y="66" text-anchor="middle">CITE ↗</text>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .graph {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(10, 10, 10, 0.4) 1px, transparent 1px);
+    background-size: 6px 6px;
+  }
+
+  .graph__svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .graph__mesh path {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1;
+    opacity: 0.35;
+  }
+
+  .graph__nodes circle {
+    fill: var(--color-ink);
+  }
+
+  /* The answer path: hidden by its own length until hover reveals it. */
+  .graph__path {
+    stroke: var(--color-accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* pathLength="1" on the element normalises the path, so one dash unit is
+       the whole line however long it actually measures. */
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.45s var(--ease-out);
+  }
+
+  .graph__hops circle {
+    fill: var(--color-accent);
+    opacity: 0;
+    transition: opacity 0.2s var(--ease-out);
+  }
+
+  .graph__cite {
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out) 0.3s;
+  }
+
+  .graph__cite rect {
+    fill: var(--color-accent);
+  }
+
+  .graph__cite text {
+    fill: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.08em;
+  }
+
+  /* Hover state lives on the tile, so the whole card is the trigger. */
+  :global(.tile:hover) .graph__path,
+  :global(.tile:focus-within) .graph__path {
+    stroke-dashoffset: 0;
+  }
+
+  :global(.tile:hover) .graph__hops circle,
+  :global(.tile:focus-within) .graph__hops circle {
+    opacity: 1;
+  }
+
+  :global(.tile:hover) .graph__cite,
+  :global(.tile:focus-within) .graph__cite {
+    opacity: 1;
+  }
+
+  /* Reduced motion: show the finished state, with no drawing. */
+  @media (prefers-reduced-motion: reduce) {
+    .graph__path {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+
+    .graph__hops circle,
+    .graph__cite {
+      opacity: 1;
+      transition: none;
+    }
+  }
+</style>

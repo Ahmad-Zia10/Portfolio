@@ -113,8 +113,14 @@ const meta = isPersonal
   .tile__media {
     position: relative;
     flex: 1;
-    min-height: 7rem;
+    /* Artwork needs real height to read; without a floor the tile collapses
+       the media to its minimum and the graph/route become slivers. */
+    min-height: 10rem;
     overflow: hidden;
+  }
+
+  .tile--feature .tile__media {
+    min-height: 14rem;
   }
 
   .tile--side {
@@ -134,7 +140,7 @@ const meta = isPersonal
     position: absolute;
     inset: 0;
     background-image: radial-gradient(
-      var(--illus-deep) 1px,
+      rgba(10, 10, 10, 0.4) 1px,
       transparent 1px
     );
     background-size: 6px 6px;
@@ -153,6 +159,7 @@ const meta = isPersonal
     display: flex;
     align-items: baseline;
     gap: var(--space-2);
+    flex-wrap: wrap;
   }
 
   .tile__code {

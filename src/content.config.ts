@@ -14,6 +14,8 @@ const projects = defineCollection({
     repo: z.url().optional(),
     live: z.url().optional(),
     summary: z.string(),
+    /** Optional shorter title for the Work tile, when the full name is long. */
+    shortName: z.string().optional(),
     /** Short one-or-two-line outcome, used on the Work bento tiles. */
     tagline: z.string(),
     stack: z.array(z.string()),
