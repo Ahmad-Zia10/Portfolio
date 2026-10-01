@@ -54,7 +54,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
     <script>
       import { initUI } from "../scripts/ui";
 
-      // Nav + carousel enhancement. Runs on first load and after every
+      // Nav + portrait enhancement. Runs on first load and after every
       // view transition.
       initUI();
       document.addEventListener("astro:page-load", initUI);

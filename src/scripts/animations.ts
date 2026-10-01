@@ -24,6 +24,9 @@ export async function init() {
     marquees(gsap);
   });
 
+  // Loaded separately so a failure here cannot take the rest down with it.
+  scrambleCodes(gsap).catch(() => {});
+
   // Re-run after Astro view transitions swap the DOM.
   document.addEventListener(
     "astro:before-swap",
@@ -41,6 +44,46 @@ export async function init() {
   // triggers once it is actually shown.
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) ScrollTrigger.refresh();
+  });
+}
+
+/**
+ * Work tile 3-letter codes scramble then settle on hover.
+ *
+ * The code is restored from `data-scramble` rather than read back out of the
+ * DOM, so an interrupted animation can never leave a tile showing garbage.
+ */
+async function scrambleCodes(gsap: typeof import("gsap").gsap) {
+  const codes = [...document.querySelectorAll<HTMLElement>("[data-scramble]")];
+  if (!codes.length) return;
+
+  const { ScrambleTextPlugin } = await import("gsap/ScrambleTextPlugin");
+  gsap.registerPlugin(ScrambleTextPlugin);
+
+  codes.forEach((el) => {
+    const tile = el.closest(".tile");
+    if (!tile) return;
+
+    const text = el.dataset.scramble ?? el.textContent ?? "";
+    let tween: gsap.core.Tween | null = null;
+
+    const run = () => {
+      tween?.kill();
+      tween = gsap.to(el, {
+        duration: 0.45,
+        scrambleText: { text, chars: "upperCase", speed: 0.6 },
+      });
+    };
+
+    const reset = () => {
+      tween?.kill();
+      el.textContent = text;
+    };
+
+    tile.addEventListener("pointerenter", run);
+    tile.addEventListener("pointerleave", reset);
+    tile.addEventListener("focusin", run);
+    tile.addEventListener("focusout", reset);
   });
 }
 

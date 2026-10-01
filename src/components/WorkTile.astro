@@ -1,0 +1,268 @@
+---
+/**
+ * One project tile in the Work bento grid.
+ *
+ * The visual half is a slot so each project can supply its own artwork
+ * (waveform, knowledge graph, route map, dithered image). Unfilled slots show
+ * a dotted placeholder.
+ */
+interface Props {
+  code: string;
+  client: string;
+  name: string;
+  year: string;
+  tagline: string;
+  slug: string;
+  stack?: readonly string[];
+  index: number;
+  total: number;
+  /** Feature tile gets the larger type and shows stack + an explicit CTA. */
+  feature?: boolean;
+  /** Grid area name, set by the parent. */
+  area: string;
+  /** Media sits beside the text instead of above it (used by LRN). */
+  side?: boolean;
+}
+
+const {
+  code,
+  client,
+  name,
+  year,
+  tagline,
+  slug,
+  stack,
+  index,
+  total,
+  feature = false,
+  area,
+  side = false,
+} = Astro.props;
+
+// Personal projects have no client to credit, so the label is dropped.
+const isPersonal = client.toLowerCase().includes("personal");
+const meta = isPersonal
+  ? feature
+    ? `Personal project · ${year}`
+    : "Personal project"
+  : `${client} · ${year}`;
+---
+
+<article
+  class:list={["tile", { "tile--feature": feature, "tile--side": side }]}
+  style={`grid-area:${area}`}
+  data-reveal
+>
+  <div class="tile__media">
+    <slot name="media">
+      <span class="tile__placeholder" aria-hidden="true"></span>
+    </slot>
+  </div>
+
+  <div class="tile__body">
+    <div class="tile__head">
+      <span class="tile__code" data-scramble={code}>{code}</span>
+      {!feature && <h3 class="tile__name">{name}</h3>}
+      <span class="tile__index">
+        {String(index).padStart(2, "0")}/{String(total).padStart(2, "0")}
+        {!feature && <span class="tile__arrow" aria-hidden="true">↗</span>}
+      </span>
+    </div>
+
+    {feature && <h3 class="tile__name tile__name--feature">{name}</h3>}
+    <p class="tile__meta">{meta}</p>
+    <p class="tile__tagline">{tagline}</p>
+
+    {
+      feature && stack && (
+        <div class="tile__foot">
+          <span class="tile__stack">{stack.slice(0, 4).join("  ")}</span>
+          <span class="tile__cta">
+            View case <span aria-hidden="true">→</span>
+          </span>
+        </div>
+      )
+    }
+
+    <a class="tile__link" href={`/work/${slug}`}>
+      <span class="sr-only">{name} — view case study</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid var(--hairline);
+    background: var(--color-brand);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .tile:hover,
+  .tile:focus-within {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+  }
+
+  /* ---- Media half ---- */
+  .tile__media {
+    position: relative;
+    flex: 1;
+    min-height: 7rem;
+    overflow: hidden;
+  }
+
+  .tile--side {
+    flex-direction: row;
+  }
+
+  .tile--side .tile__media {
+    flex: 0 0 42%;
+  }
+
+  .tile--side .tile__body {
+    flex: 1;
+  }
+
+  /* Dotted field stands in for artwork that is not built yet. */
+  .tile__placeholder {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      var(--illus-deep) 1px,
+      transparent 1px
+    );
+    background-size: 6px 6px;
+    opacity: 0.85;
+  }
+
+  /* ---- Text half ---- */
+  .tile__body {
+    position: relative;
+    background: var(--surface);
+    color: var(--surface-fg);
+    padding: var(--space-2) var(--space-3) var(--space-3);
+  }
+
+  .tile__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .tile__code {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-accent);
+    /* Scramble swaps characters, so a fixed box stops the row reflowing. */
+    min-width: 3.4ch;
+    display: inline-block;
+  }
+
+  .tile__name {
+    font-size: var(--fs-body);
+    font-weight: var(--weight-bold);
+    line-height: 1.2;
+  }
+
+  .tile__index {
+    margin-left: auto;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+
+  .tile__arrow {
+    margin-left: 0.4em;
+  }
+
+  .tile__meta {
+    margin-top: 0.35rem;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .tile__tagline {
+    margin-top: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    opacity: 0.9;
+  }
+
+  /* Whole tile is the click target. */
+  .tile__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ---- Feature tile (VOX) ---- */
+  .tile--feature .tile__code {
+    font-size: clamp(2.75rem, 5vw, 4rem);
+  }
+
+  .tile__name--feature {
+    margin-top: var(--space-1);
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    line-height: 1.15;
+  }
+
+  .tile--feature .tile__tagline {
+    font-size: var(--fs-body);
+    max-width: 52ch;
+  }
+
+  .tile__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+    flex-wrap: wrap;
+  }
+
+  .tile__stack,
+  .tile__cta {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .tile__stack {
+    opacity: 0.55;
+  }
+
+  .tile__cta {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 768px) {
+    .tile--side {
+      flex-direction: column;
+    }
+
+    .tile--side .tile__media {
+      flex: none;
+      min-height: 8rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile:hover,
+    .tile:focus-within {
+      transform: none;
+    }
+  }
+</style>

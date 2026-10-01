@@ -6,6 +6,7 @@ year: "2025"
 tags: ["VOICE AI", "LIVEKIT", "AGENTIC", "WEBRTC", "VLLM"]
 accentColor: "#FFC864"
 summary: "A production speech-to-speech agent that answers a real phone line, holds a sub-second conversation, and actually completes the task it was asked to do."
+tagline: "Answers a real hotel phone line in under a second — and completes the taxi, food or spa booking before hanging up."
 stack:
   - "Kyutai Unmute (streaming STT/TTS)"
   - "LiveKit / WebRTC"

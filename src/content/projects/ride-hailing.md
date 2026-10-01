@@ -5,6 +5,7 @@ name: "Ride-Hailing & Parcel Platform"
 year: "2025"
 tags: ["POSTGIS", "REDIS", "NODE.JS", "LEDGER", "CI/CD"]
 summary: "Backend services for an all-India ride-hailing and parcel platform — geospatial driver matching and a double-entry ledger for payouts."
+tagline: "Geospatial driver matching and a double-entry ledger behind every trip."
 stack:
   - "Node.js / Express"
   - "PostgreSQL + PostGIS"

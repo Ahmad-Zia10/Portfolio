@@ -1,0 +1,189 @@
+---
+import { getCollection } from "astro:content";
+import WorkTile from "./WorkTile.astro";
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const total = projects.length;
+
+const byCode = Object.fromEntries(projects.map((p) => [p.data.code, p]));
+const vox = byCode.VOX;
+const doc = byCode.DOC;
+const mnt = byCode.MNT;
+const geo = byCode.GEO;
+const lrn = byCode.LRN;
+
+const indexOf = (code: string) =>
+  projects.findIndex((p) => p.data.code === code) + 1;
+---
+
+<section class="work" id="work" aria-labelledby="work-h">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display" id="work-h">
+        <span class="section-head__clip"><span data-section-word>Work</span></span>
+      </h2>
+      <span class="section-head__code">{total} projects · hover a tile</span>
+    </div>
+
+    <div class="bento" data-reveal-group>
+      <WorkTile
+        area="vox"
+        feature
+        code={vox.data.code}
+        client={vox.data.client}
+        name={vox.data.name}
+        year={vox.data.year}
+        tagline={vox.data.tagline}
+        stack={vox.data.tags}
+        slug={vox.id}
+        index={indexOf("VOX")}
+        total={total}
+      />
+
+      <WorkTile
+        area="doc"
+        code={doc.data.code}
+        client={doc.data.client}
+        name={doc.data.name}
+        year={doc.data.year}
+        tagline={doc.data.tagline}
+        slug={doc.id}
+        index={indexOf("DOC")}
+        total={total}
+      />
+
+      <WorkTile
+        area="mnt"
+        code={mnt.data.code}
+        client={mnt.data.client}
+        name={mnt.data.name}
+        year={mnt.data.year}
+        tagline={mnt.data.tagline}
+        slug={mnt.id}
+        index={indexOf("MNT")}
+        total={total}
+      />
+
+      <WorkTile
+        area="geo"
+        code={geo.data.code}
+        client={geo.data.client}
+        name={geo.data.name}
+        year={geo.data.year}
+        tagline={geo.data.tagline}
+        slug={geo.id}
+        index={indexOf("GEO")}
+        total={total}
+      />
+
+      <WorkTile
+        area="lrn"
+        side
+        code={lrn.data.code}
+        client={lrn.data.client}
+        name={lrn.data.name}
+        year={lrn.data.year}
+        tagline={lrn.data.tagline}
+        slug={lrn.id}
+        index={indexOf("LRN")}
+        total={total}
+      />
+
+      <a class="lab-tile" href="/lab">
+        <span class="label lab-tile__kicker">More builds</span>
+        <span class="lab-tile__word">Lab</span>
+        <span class="label lab-tile__cta">
+          Smaller experiments <span aria-hidden="true">→</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-head__clip {
+    display: block;
+    overflow: hidden;
+  }
+
+  .section-head__clip > span {
+    display: block;
+  }
+
+  /* ---- Bento ----
+     Desktop is a 4-column grid: VOX occupies a 2x2 block, DOC spans the two
+     right columns, MNT and GEO sit beneath it one column each, and the last
+     row pairs LRN with the Lab tile. */
+  .bento {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "vox"
+      "doc"
+      "mnt"
+      "geo"
+      "lrn"
+      "lab";
+  }
+
+  @media (min-width: 769px) {
+    .bento {
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(0, auto);
+      grid-template-areas:
+        "vox vox doc doc"
+        "vox vox mnt geo"
+        "lrn lrn lab lab";
+    }
+  }
+
+  /* ---- Lab tile ---- */
+  .lab-tile {
+    grid-area: lab;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-height: 9rem;
+    padding: var(--space-3);
+    border: 1px dashed var(--hairline);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .lab-tile:hover,
+  .lab-tile:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+  }
+
+  .lab-tile__kicker {
+    opacity: 0.7;
+  }
+
+  .lab-tile__word {
+    margin-top: auto;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: var(--weight-bold);
+    line-height: 0.9;
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+  }
+
+  .lab-tile__cta {
+    align-self: flex-end;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lab-tile:hover,
+    .lab-tile:focus-visible {
+      transform: none;
+    }
+  }
+</style>
