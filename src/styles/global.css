@@ -236,6 +236,28 @@ section[id] {
   }
 }
 
+/* ---- View transitions ----
+   Shared elements (the 3-letter code, title and artwork) morph between the
+   Work tile and its case study. Everything else cross-fades.
+
+   Browsers without view-transition support fall back to a normal page load,
+   which is why no content depends on these rules. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(*) {
+    animation-duration: 0.42s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* Reduced motion: swap instantly rather than morphing. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Giant section words ("WORK", "ABOUT") wipe up from their clipping mask.
    The word itself is never faded — only its position animates — so the
    heading is always legible, even mid-animation. */

@@ -2,7 +2,9 @@
 import { site, nav, bookingHref, hasCalendly } from "../site";
 ---
 
-<header class="nav">
+<!-- Persisted across view transitions: the nav is identical on every page,
+     so re-mounting it would flash the logo and drop the open mobile menu. -->
+<header class="nav" transition:persist transition:name="site-nav">
   <div class="nav__inner">
     <a class="nav__logo" href="/" aria-label={`${site.name} — home`}>
       <svg viewBox="0 0 64 32" width="64" height="32" aria-hidden="true">

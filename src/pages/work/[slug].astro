@@ -4,6 +4,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Nav from "../../components/Nav.astro";
 import Footer from "../../components/Footer.astro";
 import Tag from "../../components/Tag.astro";
+import DocGraph from "../../components/media/DocGraph.astro";
+import GeoRoute from "../../components/media/GeoRoute.astro";
+import { tx } from "../../transitions";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -22,6 +25,7 @@ export async function getStaticPaths() {
 const { entry, prev, next } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
+const t = tx(entry.id);
 ---
 
 <BaseLayout title={d.name} description={d.summary}>
@@ -31,9 +35,35 @@ const d = entry.data;
     <div class="shell">
       <a class="proj__back" href="/#work">← All work</a>
 
+      <!-- Morph target for the tile's artwork. The tile media grows into this
+           banner during the view transition. -->
+      <div class="proj__banner" transition:name={t.media}>
+        {
+          d.code === "DOC" ? (
+            <DocGraph />
+          ) : d.code === "GEO" ? (
+            <GeoRoute />
+          ) : (
+            <span class="proj__bannerFill" aria-hidden="true" />
+          )
+        }
+      </div>
+
       <header class="proj__head">
-        <p class="proj__code">{d.code}</p>
-        <h1 class="proj__title">{d.name}</h1>
+        <p class="proj__code" transition:name={t.code}>{d.code}</p>
+        <!-- The morphing span carries the same text the tile shows, so the
+             shared element does not swap words mid-flight. Any remainder of a
+             long title follows it, outside the transition. -->
+        <h1 class="proj__title">
+          <span transition:name={t.title}>{d.shortName ?? d.name}</span>
+          {
+            d.shortName && (
+              <span class="proj__titleRest">
+                {d.name.slice(d.shortName.length)}
+              </span>
+            )
+          }
+        </h1>
         <p class="proj__meta">{d.client} · {d.year}</p>
         <p class="proj__summary">{d.summary}</p>
 
@@ -126,9 +156,32 @@ const d = entry.data;
     color: var(--color-accent);
   }
 
+  /* Banner: the tile's artwork, grown to full width. */
+  .proj__banner {
+    position: relative;
+    margin-top: var(--space-3);
+    height: clamp(9rem, 26vw, 16rem);
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+  }
+
+  .proj__bannerFill {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      rgba(10, 10, 10, 0.4) 1px,
+      transparent 1px
+    );
+    background-size: 6px 6px;
+  }
+
   .proj__head {
     padding-block: var(--space-4) var(--space-6);
     border-bottom: 1px solid var(--hairline);
+  }
+
+  .proj__titleRest {
+    opacity: 0.75;
   }
 
   .proj__code {

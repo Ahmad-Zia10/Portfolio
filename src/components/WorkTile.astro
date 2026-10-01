@@ -1,4 +1,5 @@
 ---
+import { tx } from "../transitions";
 /**
  * One project tile in the Work bento grid.
  *
@@ -39,6 +40,8 @@ const {
   side = false,
 } = Astro.props;
 
+const t = tx(slug);
+
 // Personal projects have no client to credit, so the label is dropped.
 const isPersonal = client.toLowerCase().includes("personal");
 const meta = isPersonal
@@ -53,7 +56,7 @@ const meta = isPersonal
   style={`grid-area:${area}`}
   data-reveal
 >
-  <div class="tile__media">
+  <div class="tile__media" transition:name={t.media}>
     <slot name="media">
       <span class="tile__placeholder" aria-hidden="true"></span>
     </slot>
@@ -61,15 +64,15 @@ const meta = isPersonal
 
   <div class="tile__body">
     <div class="tile__head">
-      <span class="tile__code" data-scramble={code}>{code}</span>
-      {!feature && <h3 class="tile__name">{name}</h3>}
+      <span class="tile__code" data-scramble={code} transition:name={t.code}>{code}</span>
+      {!feature && <h3 class="tile__name" transition:name={t.title}>{name}</h3>}
       <span class="tile__index">
         {String(index).padStart(2, "0")}/{String(total).padStart(2, "0")}
         {!feature && <span class="tile__arrow" aria-hidden="true">↗</span>}
       </span>
     </div>
 
-    {feature && <h3 class="tile__name tile__name--feature">{name}</h3>}
+    {feature && <h3 class="tile__name tile__name--feature" transition:name={t.title}>{name}</h3>}
     <p class="tile__meta">{meta}</p>
     <p class="tile__tagline">{tagline}</p>
 
