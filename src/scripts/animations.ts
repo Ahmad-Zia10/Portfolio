@@ -1,6 +1,13 @@
 /**
- * GSAP scroll/motion layer. Loaded dynamically and only when
- * `prefers-reduced-motion: no-preference` matches — see BaseLayout.
+ * GSAP motion layer.
+ *
+ * Simple reveals are NOT here — they run as native CSS scroll-driven
+ * animations in global.css, which the browser drives off the main thread.
+ * GSAP is reserved for effects CSS cannot express: scrubbed parallax tied to
+ * scroll position, and the marquee, which needs frame-accurate pause/resume.
+ *
+ * Loaded dynamically and only when `prefers-reduced-motion: no-preference`
+ * matches — see BaseLayout.
  */
 let started = false;
 
@@ -12,18 +19,10 @@ export async function init() {
   const { ScrollTrigger } = await import("gsap/ScrollTrigger");
   gsap.registerPlugin(ScrollTrigger);
 
-  // Only now is it safe to hide reveal targets: GSAP is loaded and will
-  // animate them back in. Before this point the content renders normally.
-  document.documentElement.dataset.motion = "on";
-
   const ctx = gsap.context(() => {
-    revealOnScroll(gsap);
-    sectionWords(gsap);
     heroParallax(gsap);
     marquees(gsap);
   });
-
-  watchForStranded();
 
   // Re-run after Astro view transitions swap the DOM.
   document.addEventListener(
@@ -45,108 +44,11 @@ export async function init() {
   });
 }
 
-/**
- * Safety net for the reveal animation.
- *
- * Setting up ScrollTrigger is not the same as it firing: a tab that is hidden
- * or backgrounded gets no animation frames, so triggers never run and any
- * [data-reveal] element scrolled into view would stay at opacity 0 — content
- * silently lost. This watches for an element that is on screen but still
- * hidden and, if it finds one, drops the motion flag so CSS renders everything
- * normally. It costs one bounding-box check per scroll (throttled to a frame)
- * and stops watching once the page has been seen working.
- */
-function watchForStranded() {
-  const root = document.documentElement;
-  let queued = false;
-  let clean = 0;
-
-  const check = () => {
-    queued = false;
-    if (root.dataset.motion !== "on") return stop();
-
-    const els = [...document.querySelectorAll<HTMLElement>("[data-reveal]")];
-    const onScreen = els.filter((el) => {
-      const r = el.getBoundingClientRect();
-      return r.top < window.innerHeight && r.bottom > 0;
-    });
-
-    if (!onScreen.length) return;
-
-    if (onScreen.some((el) => getComputedStyle(el).opacity === "0")) {
-      delete root.dataset.motion;
-      // Dropping the flag only removes the CSS rule. GSAP may already have
-      // written inline opacity/transform onto these elements, so clear those
-      // too or they stay invisible.
-      els.forEach((el) => {
-        el.style.removeProperty("opacity");
-        el.style.removeProperty("transform");
-        el.style.removeProperty("visibility");
-      });
-      return stop();
-    }
-
-    // Seen a screenful reveal correctly several times: motion works here.
-    if (++clean > 3) stop();
-  };
-
-  const onScroll = () => {
-    if (queued) return;
-    queued = true;
-    window.requestAnimationFrame(check);
-  };
-
-  let timer = 0;
-
-  const stop = () => {
-    window.removeEventListener("scroll", onScroll);
-    window.clearInterval(timer);
-  };
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  // Also poll, because a hidden tab delivers no scroll events either.
-  timer = window.setInterval(check, 1000);
-  window.setTimeout(check, 1200);
-}
-
-function revealOnScroll(gsap: typeof import("gsap").gsap) {
-  const groups = new Map<Element, Element[]>();
-
-  document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
-    const parent = el.closest("[data-reveal-group]") ?? el.parentElement ?? el;
-    if (!groups.has(parent)) groups.set(parent, []);
-    groups.get(parent)!.push(el);
-  });
-
-  groups.forEach((els, parent) => {
-    gsap.to(els, {
-      opacity: 1,
-      y: 0,
-      duration: 0.7,
-      ease: "power3.out",
-      stagger: 0.08,
-      scrollTrigger: { trigger: parent, start: "top 85%", once: true },
-    });
-  });
-}
-
-function sectionWords(gsap: typeof import("gsap").gsap) {
-  document.querySelectorAll<HTMLElement>("[data-section-word]").forEach((el) => {
-    gsap.from(el, {
-      yPercent: 110,
-      duration: 0.9,
-      ease: "power4.out",
-      scrollTrigger: { trigger: el, start: "top 90%", once: true },
-    });
-  });
-}
-
+/** Decorative marks drift as the hero scrolls out; the portrait stays put. */
 function heroParallax(gsap: typeof import("gsap").gsap) {
   const scene = document.querySelector("[data-hero-scene]");
   if (!scene) return;
 
-  // The decorative marks drift faster than the portrait, which stays put:
-  // the portrait is bottom-anchored, so moving it would break that alignment.
   const marks = scene.querySelector(".hero__marks");
   if (!marks) return;
 
@@ -162,13 +64,17 @@ function heroParallax(gsap: typeof import("gsap").gsap) {
   });
 }
 
-/** Swap the CSS marquee for a GSAP one so hover-pause is frame-accurate. */
+/**
+ * Swap the CSS marquee for a GSAP one.
+ *
+ * Kept on GSAP because pausing a CSS animation mid-cycle and resuming it
+ * without a jump is not something CSS does cleanly.
+ */
 function marquees(gsap: typeof import("gsap").gsap) {
   document.querySelectorAll<HTMLElement>("[data-marquee]").forEach((el) => {
-    const track = el.querySelector<HTMLElement>(".marquee__track");
-    if (!track) return;
-
     const tracks = el.querySelectorAll<HTMLElement>(".marquee__track");
+    if (!tracks.length) return;
+
     tracks.forEach((t) => (t.style.animation = "none"));
 
     const loop = gsap.to(tracks, {
@@ -178,9 +84,34 @@ function marquees(gsap: typeof import("gsap").gsap) {
       repeat: -1,
     });
 
-    el.addEventListener("pointerenter", () => loop.pause());
-    el.addEventListener("pointerleave", () => loop.play());
-    el.addEventListener("focusin", () => loop.pause());
-    el.addEventListener("focusout", () => loop.play());
+    let hovered = false;
+    let onScreen = false;
+
+    const sync = () => {
+      if (onScreen && !hovered) loop.play();
+      else loop.pause();
+    };
+
+    // Only run while visible. Each track is ~2900px wide, so animating it
+    // off-screen is wasted compositing on every frame.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        onScreen = entry.isIntersecting;
+        sync();
+      },
+      { rootMargin: "100px" },
+    );
+    io.observe(el);
+    loop.pause();
+
+    const setHover = (v: boolean) => {
+      hovered = v;
+      sync();
+    };
+
+    el.addEventListener("pointerenter", () => setHover(true));
+    el.addEventListener("pointerleave", () => setHover(false));
+    el.addEventListener("focusin", () => setHover(true));
+    el.addEventListener("focusout", () => setHover(false));
   });
 }

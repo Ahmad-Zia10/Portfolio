@@ -59,15 +59,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
       initUI();
       document.addEventListener("astro:page-load", initUI);
 
-      // Content is visible by default. [data-reveal] elements are only hidden
-      // once GSAP has actually loaded and can animate them back in, so a failed
-      // chunk, a slow network, or a JS error can never leave the page blank.
+      // Reveals are pure CSS (see global.css) and need no JS at all. GSAP is
+      // only loaded for the parallax and marquee, so a failed chunk costs
+      // those two effects and nothing else — content is never hidden by JS.
       if (window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
         import("../scripts/animations")
           .then((m) => m.init())
-          .catch(() => {
-            delete document.documentElement.dataset.motion;
-          });
+          .catch(() => {});
       }
     </script>
   </body>

@@ -201,16 +201,61 @@ section[id] {
   color: var(--color-brand);
 }
 
-/* ---- Reveal-on-scroll base state.
-   Only applied once JS confirms motion is allowed, so no-JS users
-   and reduced-motion users never see hidden content. ---- */
+/* ---- Reveal on scroll ----
+   Native CSS scroll-driven animation. The browser runs this off the main
+   thread, so there is no JS, no scroll listener and no forced style recalc.
+
+   Content is visible by default and only animates where the feature is
+   supported, so no-JS, older browsers and reduced-motion users always see the
+   finished state. Section headings are deliberately excluded — a heading must
+   never be hidden waiting for an animation. */
 [data-reveal] {
   opacity: 1;
 }
 
-html[data-motion="on"] [data-reveal] {
-  opacity: 0;
-  transform: translateY(2rem);
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      /* Starts as the element enters and finishes well before it is centred,
+         so nothing sits half-revealed in the middle of the viewport. */
+      animation-range: entry 0% cover 28%;
+    }
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Giant section words ("WORK", "ABOUT") wipe up from their clipping mask.
+   The word itself is never faded — only its position animates — so the
+   heading is always legible, even mid-animation. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-section-word] {
+      animation: word-wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 90%;
+    }
+  }
+}
+
+@keyframes word-wipe {
+  from {
+    transform: translateY(85%);
+  }
+  to {
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

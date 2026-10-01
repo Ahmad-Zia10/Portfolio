@@ -37,6 +37,9 @@ import { credentials } from "../site";
     padding-block: var(--space-2);
     /* Fallback for no-JS: CSS-driven scroll. */
     --marquee-dur: 45s;
+    /* Skips rendering work entirely while the strip is off-screen. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 3rem;
   }
 
   .marquee__track {
@@ -46,6 +49,12 @@ import { credentials } from "../site";
     gap: var(--space-4);
     padding-right: var(--space-4);
     animation: scroll var(--marquee-dur) linear infinite;
+    /* Each track is ~2900px of text. Without its own compositor layer, moving
+       it repaints that whole strip every frame, which saturates the main
+       thread and locks the page up when this section scrolls into view. */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .marquee:hover .marquee__track,

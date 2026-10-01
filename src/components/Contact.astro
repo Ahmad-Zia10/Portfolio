@@ -1,5 +1,5 @@
 ---
-import { site } from "../site";
+import { site, bookingHref, hasCalendly } from "../site";
 
 const rows = [
   { label: "Email", value: site.email, href: `mailto:${site.email}` },
@@ -24,7 +24,12 @@ const rows = [
           Building something that needs an agent to actually do the work? I'd
           like to hear about it.
         </p>
-        <a class="pill contact__cta" href={site.calendly} target="_blank" rel="noopener">
+        <a
+          class="pill contact__cta"
+          href={bookingHref}
+          target={hasCalendly ? "_blank" : undefined}
+          rel={hasCalendly ? "noopener" : undefined}
+        >
           [Book a call]
         </a>
       </div>

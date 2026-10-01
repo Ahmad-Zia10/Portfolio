@@ -1,5 +1,5 @@
 ---
-import { site, nav } from "../site";
+import { site, nav, bookingHref, hasCalendly } from "../site";
 ---
 
 <header class="nav">
@@ -42,7 +42,12 @@ import { site, nav } from "../site";
       </ul>
     </nav>
 
-    <a class="pill nav__cta" href={site.calendly} target="_blank" rel="noopener">
+    <a
+      class="pill nav__cta"
+      href={bookingHref}
+      target={hasCalendly ? "_blank" : undefined}
+      rel={hasCalendly ? "noopener" : undefined}
+    >
       [Let's talk]
     </a>
 
@@ -72,9 +77,9 @@ import { site, nav } from "../site";
         <li>
           <a
             class="nav__overlayLink nav__overlayLink--cta"
-            href={site.calendly}
-            target="_blank"
-            rel="noopener"
+            href={bookingHref}
+            target={hasCalendly ? "_blank" : undefined}
+            rel={hasCalendly ? "noopener" : undefined}
           >
             [Let's talk]
           </a>

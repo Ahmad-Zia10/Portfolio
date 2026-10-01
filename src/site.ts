@@ -6,14 +6,33 @@ export const site = {
   location: "New Delhi, India",
   email: "mail.ahmadzia07@gmail.com",
   phone: "+91-9452709547",
-  /** TODO: replace with a real Calendly link. */
-  calendly: "https://calendly.com/",
+  /**
+   * [PLACEHOLDER] Replace with the real Calendly URL.
+   *
+   * Until this is a real link, every "Book a call" / "Let's talk" control
+   * falls back to email — see `bookingHref` below. Shipping a link to
+   * calendly.com's homepage would look broken to a visitor.
+   */
+  calendly: "",
   github: "https://github.com/Ahmad-Zia10",
   linkedin: "https://linkedin.com/in/ahmad-zia",
   url: "https://ahmadzia.dev",
   description:
     "Ahmad Zia is an AI engineer building agentic systems, retrieval pipelines, and realtime voice agents — from sub-second phone agents to citation-grounded RAG.",
 } as const;
+
+/**
+ * Where every booking CTA points.
+ *
+ * Falls back to a pre-filled email while `site.calendly` is unset, so the
+ * button always does something useful instead of opening calendly.com.
+ */
+export const bookingHref: string =
+  site.calendly ||
+  `mailto:${site.email}?subject=${encodeURIComponent("Let's talk")}`;
+
+/** True once a real Calendly URL is configured. */
+export const hasCalendly = Boolean(site.calendly);
 
 export const nav = [
   { label: "Work", href: "/#work" },
