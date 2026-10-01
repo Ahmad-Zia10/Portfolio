@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# dithering pipeline
+src/assets/dithered/.manifest.json
+src/assets/dithered/.tmp/

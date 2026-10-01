@@ -10,7 +10,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "dither": "node scripts/dither.mjs",
+    "dither:sample": "node scripts/dither.mjs --sample",
+    "prebuild": "node scripts/dither.mjs"
   },
   "dependencies": {
     "astro": "^7.3.3",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "sharp": "^0.35.5",
     "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@11.5.2"
