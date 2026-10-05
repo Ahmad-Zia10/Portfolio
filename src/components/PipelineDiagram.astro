@@ -1,0 +1,158 @@
+---
+/**
+ * VOX call pipeline: SIP → bridge → LiveKit → vLLM → tools.
+ *
+ * As the reader scrolls through the section a yellow dot travels the path and
+ * each stage lights up in turn (GSAP ScrollTrigger + DrawSVG). Under reduced
+ * motion, or with no JS, the whole path is drawn and every stage is lit — the
+ * diagram is never dependent on the animation to be readable.
+ */
+
+interface Stage {
+  id: string;
+  label: string;
+  detail: string;
+  x: number;
+}
+
+const stages: Stage[] = [
+  { id: "sip", label: "SIP", detail: "Phone line", x: 70 },
+  { id: "bridge", label: "BRIDGE", detail: "WebSocket audio", x: 230 },
+  { id: "livekit", label: "LIVEKIT", detail: "WebRTC transport", x: 390 },
+  { id: "vllm", label: "VLLM", detail: "Llama 3.1", x: 550 },
+  { id: "tools", label: "TOOLS", detail: "Taxi · POS · spa", x: 710 },
+];
+
+const Y = 64;
+const BOX_W = 104;
+const BOX_H = 44;
+
+// The travelling dot follows the same line the connectors are drawn from.
+const trackD = `M${stages[0].x} ${Y} H${stages[stages.length - 1].x}`;
+---
+
+<figure class="pipe" data-pipeline>
+  <figcaption class="label pipe__cap">
+    Call pipeline · audio in, action out
+  </figcaption>
+
+  <svg
+    class="pipe__svg"
+    viewBox="0 0 780 132"
+    role="img"
+    aria-label="Call pipeline: SIP phone line to WebSocket bridge to LiveKit WebRTC transport to vLLM running Llama 3.1 to tool calls for taxi, point of sale and spa bookings."
+  >
+    <!-- Connector the dot rides. Drawn progressively on scroll. -->
+    <path class="pipe__track" d={trackD} pathLength="1" />
+
+    {
+      stages.map((s, i) => (
+        <g class="pipe__stage" data-stage={s.id} data-index={i}>
+          <rect
+            x={s.x - BOX_W / 2}
+            y={Y - BOX_H / 2}
+            width={BOX_W}
+            height={BOX_H}
+          />
+          <text class="pipe__label" x={s.x} y={Y - 2} text-anchor="middle">
+            {s.label}
+          </text>
+          <text class="pipe__detail" x={s.x} y={Y + 13} text-anchor="middle">
+            {s.detail}
+          </text>
+        </g>
+      ))
+    }
+
+    <circle class="pipe__dot" r="6" cx={stages[0].x} cy={Y} />
+  </svg>
+</figure>
+
+<style>
+  .pipe {
+    margin: 0;
+    padding: var(--space-3);
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    color: var(--surface-fg);
+    overflow-x: auto;
+  }
+
+  .pipe__cap {
+    opacity: 0.6;
+    margin-bottom: var(--space-2);
+  }
+
+  .pipe__svg {
+    width: 100%;
+    min-width: 34rem;
+    height: auto;
+    display: block;
+  }
+
+  .pipe__track {
+    fill: none;
+    stroke: var(--hairline-ink);
+    stroke-width: 2;
+  }
+
+  .pipe__stage rect {
+    fill: var(--color-brand);
+    stroke: var(--hairline-ink);
+    stroke-width: 1;
+  }
+
+  .pipe__label {
+    fill: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.06em;
+  }
+
+  .pipe__detail {
+    fill: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    opacity: 0.65;
+  }
+
+  .pipe__dot {
+    fill: var(--color-accent);
+    opacity: 0;
+  }
+
+  /* Active stage, set by the scroll animation. */
+  .pipe__stage[data-active] rect {
+    stroke: var(--color-accent);
+    stroke-width: 2;
+  }
+
+  .pipe__stage[data-active] .pipe__label {
+    fill: var(--color-accent);
+  }
+
+  /* ---- Pre-animation state ----
+     Only applied once the animation layer confirms it is driving, so no-JS and
+     unsupported browsers always see the finished diagram. */
+  :global(html[data-pipeline-anim]) .pipe__track {
+    stroke: var(--color-accent);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  :global(html[data-pipeline-anim]) .pipe__dot {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pipe__stage rect {
+      stroke: var(--color-accent);
+    }
+
+    .pipe__dot {
+      opacity: 0;
+    }
+  }
+</style>

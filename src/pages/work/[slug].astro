@@ -7,6 +7,8 @@ import Tag from "../../components/Tag.astro";
 import DocGraph from "../../components/media/DocGraph.astro";
 import GeoRoute from "../../components/media/GeoRoute.astro";
 import { tx } from "../../transitions";
+import PipelineDiagram from "../../components/PipelineDiagram.astro";
+import LatencyBudget from "../../components/LatencyBudget.astro";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -105,6 +107,21 @@ const t = tx(entry.id);
               </li>
             ))}
           </ul>
+        )
+      }
+
+      {
+        d.code === "VOX" && (
+          <section class="proj__pipeline" aria-labelledby="pipeline-h">
+            <h2 class="proj__sectionTitle" id="pipeline-h">
+              How a call flows
+            </h2>
+            <PipelineDiagram />
+            <LatencyBudget
+              segments={d.latency ?? []}
+              note="Fill the measured values in src/content/projects/voice-agent.md and the chart renders itself."
+            />
+          </section>
         )
       }
 
@@ -253,6 +270,16 @@ const t = tx(entry.id);
 
   .proj__metricLabel {
     opacity: 0.7;
+  }
+
+  .proj__pipeline {
+    margin-top: var(--space-8);
+  }
+
+  .proj__sectionTitle {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    margin-bottom: var(--space-3);
   }
 
   .proj__cols {

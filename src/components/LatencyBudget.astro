@@ -1,0 +1,169 @@
+---
+/**
+ * Stacked horizontal bar of where the call latency goes.
+ *
+ * Values come from the project's frontmatter. Until real measurements are
+ * supplied the component renders an explicit "awaiting data" state rather than
+ * a plausible-looking chart — an invented latency breakdown is worse than none,
+ * because a reader cannot tell it is fiction.
+ */
+
+interface Segment {
+  label: string;
+  ms: number | null;
+}
+
+interface Props {
+  segments: readonly Segment[];
+  /** Shown instead of a total when any segment is missing. */
+  note?: string;
+}
+
+const { segments, note } = Astro.props;
+
+const complete = segments.every((s) => typeof s.ms === "number" && s.ms > 0);
+const total = complete
+  ? segments.reduce((sum, s) => sum + (s.ms as number), 0)
+  : null;
+---
+
+<figure class="budget">
+  <figcaption class="label budget__cap">
+    Latency budget
+    {complete && <span class="budget__total">{total} ms end to end</span>}
+  </figcaption>
+
+  {
+    complete ? (
+      <>
+        <div class="budget__bar" role="img" aria-label={
+          segments.map((s) => `${s.label} ${s.ms} milliseconds`).join(", ")
+        }>
+          {segments.map((s, i) => (
+            <span
+              class="budget__seg"
+              data-i={i % 3}
+              style={`flex-grow:${s.ms}`}
+            />
+          ))}
+        </div>
+        <ul class="budget__key">
+          {segments.map((s, i) => (
+            <li class="budget__keyItem">
+              <span class="budget__swatch" data-i={i % 3} aria-hidden="true" />
+              {s.label}
+              <span class="budget__ms">{s.ms} ms</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <div class="budget__pending">
+        <p class="budget__pendingLead">[PLACEHOLDER] Awaiting measured values.</p>
+        <ul class="budget__key">
+          {segments.map((s) => (
+            <li class="budget__keyItem budget__keyItem--pending">
+              {s.label}
+              <span class="budget__ms">— ms</span>
+            </li>
+          ))}
+        </ul>
+        {note && <p class="budget__note">{note}</p>}
+      </div>
+    )
+  }
+</figure>
+
+<style>
+  .budget {
+    margin: var(--space-4) 0 0;
+    padding: var(--space-3);
+    border: 1px solid var(--hairline);
+  }
+
+  .budget__cap {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    opacity: 0.7;
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .budget__total {
+    color: var(--color-accent);
+    opacity: 1;
+  }
+
+  .budget__bar {
+    display: flex;
+    height: 1.75rem;
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+  }
+
+  .budget__seg {
+    display: block;
+    flex-basis: 0;
+  }
+
+  /* Three-step ramp from the one accent, so the chart adds no new colours. */
+  .budget__seg[data-i="0"],
+  .budget__swatch[data-i="0"] {
+    background: var(--color-accent);
+  }
+
+  .budget__seg[data-i="1"],
+  .budget__swatch[data-i="1"] {
+    background: color-mix(in srgb, var(--color-accent) 62%, var(--color-ink));
+  }
+
+  .budget__seg[data-i="2"],
+  .budget__swatch[data-i="2"] {
+    background: color-mix(in srgb, var(--color-accent) 32%, var(--color-ink));
+  }
+
+  .budget__key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .budget__keyItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .budget__keyItem--pending {
+    opacity: 0.55;
+  }
+
+  .budget__swatch {
+    width: 0.7em;
+    height: 0.7em;
+    flex: none;
+  }
+
+  .budget__ms {
+    opacity: 0.6;
+  }
+
+  .budget__pendingLead {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .budget__note {
+    margin-top: var(--space-2);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    opacity: 0.7;
+  }
+</style>

@@ -22,6 +22,10 @@ const projects = defineCollection({
     metrics: z
       .array(z.object({ label: z.string(), value: z.string() }))
       .optional(),
+    /** Optional measured latency breakdown for the case study chart. */
+    latency: z
+      .array(z.object({ label: z.string(), ms: z.number().nullable() }))
+      .optional(),
     order: z.number(),
   }),
 });

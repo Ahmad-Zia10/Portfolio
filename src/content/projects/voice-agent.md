@@ -14,6 +14,16 @@ stack:
   - "vLLM-served Llama 3.1"
   - "Docker + AWS EC2"
   - "React ops dashboard"
+# [PLACEHOLDER] Replace each null with the measured value in ms.
+latency:
+  - label: "STT"
+    ms: null
+  - label: "LLM"
+    ms: null
+  - label: "TTS"
+    ms: null
+  - label: "Network"
+    ms: null
 metrics:
   - label: "Latency"
     value: "<1s"
