@@ -4,7 +4,7 @@ client: "Personal Project"
 name: "DocSage"
 year: "2025"
 tags: ["GRAPH RAG", "LANGGRAPH", "FASTAPI", "EVALS", "MCP"]
-repo: "https://github.com/Ahmad-Zia10"
+repo: "https://github.com/Ahmad-Zia10/DocStage"
 summary: "An agentic documentation assistant over 700+ pages — hybrid retrieval, a knowledge-graph layer for multi-hop questions, and citations it can be held to."
 tagline: "A documentation assistant over 700+ pages — multi-hop answers grounded in citations you can check."
 stack:

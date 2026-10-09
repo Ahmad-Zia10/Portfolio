@@ -1,0 +1,203 @@
+---
+import { getCollection } from "astro:content";
+
+const builds = (await getCollection("builds")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<section class="builds" id="builds" aria-labelledby="builds-h">
+  <div class="section-head">
+    <h2 class="display" id="builds-h">
+      <span class="section-head__clip"><span data-section-word>Builds</span></span>
+    </h2>
+    <span class="section-head__code">{builds.length} more · source linked</span>
+  </div>
+
+  <ul class="builds__grid" data-reveal-group>
+    {
+      builds.map((b, i) => (
+        <li class="build" data-reveal>
+          <div class="build__head">
+            <span class="label build__index">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span class="label build__kind" data-kind={b.data.kind}>
+              {b.data.kind}
+            </span>
+            <span class="label build__year">{b.data.year}</span>
+          </div>
+
+          <h3 class="build__name">{b.data.name}</h3>
+          <p class="build__blurb">{b.data.blurb}</p>
+
+          {b.data.stack && (
+            <ul class="build__stack">
+              {b.data.stack.map((s) => (
+                <li class="build__stackItem">{s}</li>
+              ))}
+            </ul>
+          )}
+
+          <div class="build__links">
+            <a class="build__link" href={b.data.repo} target="_blank" rel="noopener">
+              Source <span aria-hidden="true">↗</span>
+            </a>
+            {b.data.live && (
+              <a
+                class="build__link build__link--live"
+                href={b.data.live}
+                target="_blank"
+                rel="noopener"
+              >
+                Live <span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .builds {
+    margin-top: var(--space-8);
+  }
+
+  .section-head__clip {
+    display: block;
+    overflow: hidden;
+  }
+
+  .section-head__clip > span {
+    display: block;
+  }
+
+  .builds__grid {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 720px) {
+    .builds__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .builds__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .build {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    color: var(--surface-fg);
+    border: 1px solid var(--hairline-ink);
+    padding: var(--space-3);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .build:hover,
+  .build:focus-within {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+  }
+
+  .build__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .build__index {
+    color: var(--color-accent);
+    font-weight: var(--weight-bold);
+  }
+
+  .build__kind {
+    opacity: 0.6;
+  }
+
+  /* Freelance work is marked so it reads as client work, not a side project. */
+  .build__kind[data-kind="Freelance"] {
+    color: var(--color-accent);
+    opacity: 1;
+  }
+
+  .build__year {
+    margin-left: auto;
+    opacity: 0.5;
+  }
+
+  .build__name {
+    margin-top: var(--space-2);
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+    line-height: 1.15;
+  }
+
+  .build__blurb {
+    margin-top: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    opacity: 0.88;
+    flex: 1;
+  }
+
+  .build__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    margin-top: var(--space-3);
+  }
+
+  .build__stackItem {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+
+  .build__links {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--hairline-ink);
+  }
+
+  .build__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-height: 44px;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent);
+    transition: opacity var(--dur-fast) var(--ease-out);
+  }
+
+  .build__link:hover {
+    opacity: 0.7;
+  }
+
+  .build__link--live {
+    color: var(--color-paper);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .build:hover,
+    .build:focus-within {
+      transform: none;
+    }
+  }
+</style>

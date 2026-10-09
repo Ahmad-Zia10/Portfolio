@@ -43,4 +43,25 @@ const services = defineCollection({
   }),
 });
 
-export const collections = { projects, services };
+/**
+ * Secondary projects — the "More builds" list on /lab.
+ *
+ * Deliberately lighter than `projects`: a line of context and a link out,
+ * not a case study. `stack` is optional so a build can be shown without
+ * claiming its technology as a skill — see eryx-hardware.
+ */
+const builds = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/builds" }),
+  schema: z.object({
+    name: z.string(),
+    kind: z.enum(["Personal", "Freelance", "Challenge", "Assignment"]),
+    year: z.string(),
+    blurb: z.string(),
+    stack: z.array(z.string()).optional(),
+    repo: z.url(),
+    live: z.url().optional(),
+    order: z.number(),
+  }),
+});
+
+export const collections = { projects, services, builds };

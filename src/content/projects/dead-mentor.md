@@ -4,7 +4,7 @@ client: "Personal Project"
 name: "Dead Mentor"
 year: "2025"
 tags: ["RAG", "PERSONAS", "LANGGRAPH", "MONGODB"]
-repo: "https://github.com/Ahmad-Zia10"
+repo: "https://github.com/Ahmad-Zia10/Dead-Mentor"
 summary: "Conversations with historical thinkers where every opinion is traceable to a source text — no invented philosophy."
 tagline: "Talk with historical thinkers — every opinion traces to a source text."
 stack:

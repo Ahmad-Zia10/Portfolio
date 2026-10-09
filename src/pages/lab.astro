@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import Tag from "../components/Tag.astro";
+import BuildsList from "../components/BuildsList.astro";
 
 const experiments = [
   {
@@ -45,9 +46,24 @@ const experiments = [
       </div>
 
       <p class="lab__lede">
-        Things I'm poking at. Unfinished on purpose — this page exists so the
-        half-formed ideas have somewhere to live.
+        Smaller builds with the source linked, and the things I'm currently
+        poking at. The experiments are unfinished on purpose — this page exists
+        so the half-formed ideas have somewhere to live.
       </p>
+
+      <BuildsList />
+
+      <section class="lab__experiments" aria-labelledby="exp-h">
+        <div class="section-head">
+          <h2 class="display" id="exp-h">
+            <span class="section-head__clip">
+              <span data-section-word>Experiments</span>
+            </span>
+          </h2>
+          <span class="section-head__code">
+            07-00-0{experiments.length} / in progress
+          </span>
+        </div>
 
       <ul class="lab__list" data-reveal-group>
         {
@@ -57,7 +73,7 @@ const experiments = [
                 <span class="label lab__code">{e.code}</span>
                 <span class="label lab__status">{e.status}</span>
               </div>
-              <h2 class="lab__name">{e.name}</h2>
+              <h3 class="lab__name">{e.name}</h3>
               <p class="lab__note">{e.note}</p>
               <ul class="lab__tags">
                 {e.tags.map((t, i) => (
@@ -69,7 +85,8 @@ const experiments = [
             </li>
           ))
         }
-      </ul>
+        </ul>
+      </section>
     </div>
   </section>
 
@@ -96,6 +113,10 @@ const experiments = [
     margin-top: var(--space-4);
     font-size: var(--fs-h3);
     line-height: 1.45;
+  }
+
+  .lab__experiments {
+    margin-top: var(--space-8);
   }
 
   .lab__list {

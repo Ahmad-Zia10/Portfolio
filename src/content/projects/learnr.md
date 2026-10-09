@@ -4,7 +4,7 @@ client: "Personal Project"
 name: "Learnr"
 year: "2024"
 tags: ["MERN", "K6", "PAYMENTS", "LOAD TESTING"]
-repo: "https://github.com/Ahmad-Zia10"
+repo: "https://github.com/Ahmad-Zia10/Learnr"
 summary: "A MERN e-learning platform, load-tested to 500+ concurrent users at p95 under 200ms."
 tagline: "[PLACEHOLDER] One-line outcome for Learnr."
 stack:
