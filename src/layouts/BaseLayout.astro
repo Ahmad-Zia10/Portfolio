@@ -6,9 +6,11 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Keeps a page out of search results — for development aids. */
+  noindex?: boolean;
 }
 
-const { title, description = site.description } = Astro.props;
+const { title, description = site.description, noindex = false } = Astro.props;
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
@@ -22,6 +24,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#2C44FF" />

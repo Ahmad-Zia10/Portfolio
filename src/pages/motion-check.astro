@@ -1,0 +1,247 @@
+---
+/**
+ * Motion self-test.
+ *
+ * Every animation on this site is CSS- or GSAP-driven and therefore needs real
+ * animation frames to observe. This page drives each one programmatically and
+ * reports what actually changed, so verifying takes one click instead of
+ * hunting across three pages.
+ *
+ * Development aid: excluded from the sitemap and noindexed. Delete it, or keep
+ * it as a regression check when touching the motion layer.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const checks = [
+  {
+    id: "frames",
+    name: "Animation frames",
+    what: "requestAnimationFrame is actually firing",
+    why: "Nothing below can run without this. A headless or hidden tab reports zero.",
+  },
+  {
+    id: "portrait",
+    name: "Portrait sharpen",
+    what: "Hovering the hero portrait fades the coarse layer to 0 in 5 steps",
+    why: "Hero · index",
+  },
+  {
+    id: "scramble",
+    name: "Tile code scramble",
+    what: "Hovering a Work tile scrambles its 3-letter code, then settles",
+    why: "WorkTile · index",
+  },
+  {
+    id: "docgraph",
+    name: "DOC path draw",
+    what: "Hovering the DOC tile draws the yellow multi-hop path and the CITE label",
+    why: "DocGraph · index",
+  },
+  {
+    id: "georoute",
+    name: "GEO marker travel",
+    what: "Hovering the GEO tile sends a marker along the dashed route",
+    why: "GeoRoute · index",
+  },
+  {
+    id: "morph",
+    name: "Tile → case study morph",
+    what: "View transitions are supported and the shared names pair up",
+    why: "transitions.ts · index → /work/[slug]",
+  },
+  {
+    id: "pipeline",
+    name: "Pipeline scrub",
+    what: "Scrolling the VOX pipeline advances the dot and lights each stage",
+    why: "PipelineDiagram · /work/voice-agent",
+  },
+  {
+    id: "freeze",
+    name: "About section responsiveness",
+    what: "Scrolling to #about keeps the main thread responsive",
+    why: "Bug #2 — never reproduced under valid conditions",
+  },
+];
+---
+
+<BaseLayout title="Motion check" description="Development aid." noindex>
+
+  <div class="shell mc">
+    <header class="mc__head">
+      <p class="label">Development aid · not linked from the site</p>
+      <h1 class="mc__title">Motion check</h1>
+      <p class="mc__lede">
+        Runs each animation and reports what measurably changed. Open this in a
+        normal browser window — a hidden or background tab delivers no animation
+        frames, and every check below will fail for that reason alone.
+      </p>
+      <button class="pill mc__run" type="button" data-run>Run all checks</button>
+      <p class="mc__summary" data-summary role="status" aria-live="polite"></p>
+    </header>
+
+    <ol class="mc__list">
+      {
+        checks.map((c) => (
+          <li class="mc__item" data-check={c.id}>
+            <div class="mc__itemHead">
+              <span class="mc__status" data-status aria-hidden="true">
+                ·
+              </span>
+              <h2 class="mc__name">{c.name}</h2>
+              <span class="label mc__where">{c.why}</span>
+            </div>
+            <p class="mc__what">{c.what}</p>
+            <p class="mc__result" data-result />
+          </li>
+        ))
+      }
+    </ol>
+
+    <section class="mc__frames" aria-labelledby="live-h">
+      <h2 class="mc__name" id="live-h">Live targets</h2>
+      <p class="mc__what">
+        The checks drive these frames. They are the real pages, not copies.
+      </p>
+      <div class="mc__frameRow">
+        <iframe class="mc__frame" src="/" title="Homepage" data-frame="home"></iframe>
+        <iframe
+          class="mc__frame"
+          src="/work/voice-agent"
+          title="Voice agent case study"
+          data-frame="vox"></iframe>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .mc {
+    padding-block: calc(var(--nav-h) + var(--space-6)) var(--space-8);
+  }
+
+  .mc__title {
+    font-size: var(--fs-h1);
+    font-weight: var(--weight-bold);
+    line-height: 1.05;
+    margin-block: var(--space-2) var(--space-3);
+  }
+
+  .mc__lede {
+    max-width: 60ch;
+    line-height: var(--leading-body);
+  }
+
+  .mc__run {
+    margin-top: var(--space-4);
+  }
+
+  .mc__summary {
+    margin-top: var(--space-3);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    min-height: 1.4em;
+  }
+
+  .mc__list {
+    margin-top: var(--space-6);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .mc__item {
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .mc__itemHead {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .mc__status {
+    width: 1.5em;
+    font-weight: var(--weight-bold);
+    color: var(--color-accent);
+  }
+
+  .mc__status[data-state="pass"] {
+    color: var(--illus-green);
+  }
+
+  .mc__status[data-state="fail"] {
+    color: var(--color-accent);
+  }
+
+  .mc__name {
+    font-size: var(--fs-h3);
+    font-weight: var(--weight-bold);
+  }
+
+  .mc__where {
+    margin-left: auto;
+    opacity: 0.55;
+  }
+
+  .mc__what {
+    margin-top: 0.35rem;
+    padding-left: 1.9em;
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  .mc__result {
+    padding-left: 1.9em;
+    margin-top: 0.4rem;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    min-height: 1.2em;
+  }
+
+  .mc__result[data-state="pass"] {
+    color: var(--illus-green);
+  }
+
+  .mc__result[data-state="fail"] {
+    color: var(--color-accent);
+  }
+
+  .mc__frames {
+    margin-top: var(--space-8);
+  }
+
+  .mc__frameRow {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 900px) {
+    .mc__frameRow {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mc__frame {
+    width: 100%;
+    height: 30rem;
+    border: 1px solid var(--hairline);
+    background: var(--color-brand);
+  }
+</style>
+
+<script>
+  import { runMotionChecks } from "../scripts/motion-check";
+
+  const setup = () => {
+    const btn = document.querySelector<HTMLButtonElement>("[data-run]");
+    if (!btn || btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", () => runMotionChecks());
+  };
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+</script>
