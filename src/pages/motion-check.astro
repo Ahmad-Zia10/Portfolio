@@ -233,13 +233,14 @@ const checks = [
 </style>
 
 <script>
-  import { runMotionChecks } from "../scripts/motion-check";
+  import { runMotionChecks, restoreMotionChecks } from "../scripts/motion-check";
 
   const setup = () => {
     const btn = document.querySelector<HTMLButtonElement>("[data-run]");
     if (!btn || btn.dataset.bound === "1") return;
     btn.dataset.bound = "1";
     btn.addEventListener("click", () => runMotionChecks());
+    restoreMotionChecks();
   };
 
   setup();

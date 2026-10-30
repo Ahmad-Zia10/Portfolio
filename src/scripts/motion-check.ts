@@ -114,19 +114,27 @@ async function checkScramble(): Promise<Verdict> {
     }
   }
 
-  await wait(700);
-  const settled = code.textContent;
+  // Wait for it to settle rather than assuming a fixed delay. A throttled tab
+  // advances the tween slowly, so a fixed wait would report a still-running
+  // tween as a stranded one.
+  let settled = code.textContent;
+  for (let i = 0; i < 40 && settled !== original; i++) {
+    await wait(50);
+    settled = code.textContent;
+  }
   hover(tile, false);
+  await wait(60);
+  const afterLeave = code.textContent;
 
   if (!changed) return { pass: false, detail: `"${original}" never scrambled` };
-  if (settled !== original)
+  if (afterLeave !== original)
     return {
       pass: false,
       detail:
-        `stranded on "${settled}", expected "${original}" — the tween stopped ` +
-        `mid-flight and left the code scrambled`,
+        `stranded on "${afterLeave}", expected "${original}" — the code did ` +
+        `not return to its real text`,
     };
-  return { pass: true, detail: `"${original}" → "${sample}" → "${settled}"` };
+  return { pass: true, detail: `"${original}" → "${sample}" → "${afterLeave}"` };
 }
 
 async function checkDocGraph(): Promise<Verdict> {
@@ -310,5 +318,51 @@ export async function runMotionChecks() {
 
   if (summary) {
     summary.textContent = `${passed} of ${items.length} passed`;
+  }
+
+  // Kept so a reload — or an HMR update mid-session — does not lose the run.
+  // Reports are the whole point of this page; losing one means running it again
+  // and possibly not reproducing the failure.
+  try {
+    const report = items.map((li) => ({
+      id: li.dataset.check,
+      pass: li.querySelector<HTMLElement>("[data-result]")!.dataset.state === "pass",
+      detail: li.querySelector("[data-result]")!.textContent,
+    }));
+    sessionStorage.setItem(
+      "motion-check",
+      JSON.stringify({ at: new Date().toISOString(), passed, report }),
+    );
+  } catch {
+    /* private mode or blocked storage — the on-screen report still stands */
+  }
+}
+
+/** Restores the last run, so a reload does not discard the results. */
+export function restoreMotionChecks() {
+  let saved: { at: string; passed: number; report: Array<{ id: string; pass: boolean; detail: string }> };
+  try {
+    const raw = sessionStorage.getItem("motion-check");
+    if (!raw) return;
+    saved = JSON.parse(raw);
+  } catch {
+    return;
+  }
+
+  saved.report?.forEach((r) => {
+    const li = document.querySelector<HTMLElement>(`[data-check="${r.id}"]`);
+    if (!li) return;
+    const status = li.querySelector<HTMLElement>("[data-status]")!;
+    const result = li.querySelector<HTMLElement>("[data-result]")!;
+    status.textContent = r.pass ? "✓" : "✕";
+    status.dataset.state = r.pass ? "pass" : "fail";
+    result.textContent = r.detail;
+    result.dataset.state = r.pass ? "pass" : "fail";
+  });
+
+  const summary = document.querySelector<HTMLElement>("[data-summary]");
+  if (summary) {
+    const when = new Date(saved.at).toLocaleTimeString();
+    summary.textContent = `${saved.passed} of ${saved.report.length} passed · restored from ${when}`;
   }
 }
