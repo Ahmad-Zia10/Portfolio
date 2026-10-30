@@ -58,14 +58,21 @@ async function checkFrames(): Promise<Verdict> {
     requestAnimationFrame(tick);
     window.setTimeout(res, 1500);
   });
-  return frames > 5
-    ? { pass: true, detail: `${frames} frames in 400ms` }
-    : {
-        pass: false,
-        detail:
-          `only ${frames} frames — this tab is hidden or throttled. ` +
-          `Bring the window to the front and re-run.`,
-      };
+  if (frames > 5) return { pass: true, detail: `${frames} frames in 400ms` };
+
+  // visibilityState only reports whether the TAB is foreground in its window.
+  // Chrome also throttles when the whole window is behind another app, and
+  // that case looks "visible" — worth naming, because it is the usual cause.
+  const looksVisible = document.visibilityState === "visible";
+  return {
+    pass: false,
+    detail:
+      `only ${frames} frames in 400ms (expect ~24). ` +
+      (looksVisible
+        ? `The tab reports visible, so the whole browser window is probably ` +
+          `behind another app. Click the window itself, then re-run.`
+        : `This tab is in the background. Switch to it and re-run.`),
+  };
 }
 
 async function checkPortrait(): Promise<Verdict> {
@@ -113,7 +120,12 @@ async function checkScramble(): Promise<Verdict> {
 
   if (!changed) return { pass: false, detail: `"${original}" never scrambled` };
   if (settled !== original)
-    return { pass: false, detail: `settled on "${settled}", expected "${original}"` };
+    return {
+      pass: false,
+      detail:
+        `stranded on "${settled}", expected "${original}" — the tween stopped ` +
+        `mid-flight and left the code scrambled`,
+    };
   return { pass: true, detail: `"${original}" → "${sample}" → "${settled}"` };
 }
 

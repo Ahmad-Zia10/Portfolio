@@ -128,6 +128,8 @@ async function scrambleCodes(gsap: typeof import("gsap").gsap) {
   const { ScrambleTextPlugin } = await import("gsap/ScrambleTextPlugin");
   gsap.registerPlugin(ScrambleTextPlugin);
 
+  const resets: Array<() => void> = [];
+
   codes.forEach((el) => {
     const tile = el.closest(".tile");
     if (!tile) return;
@@ -140,6 +142,15 @@ async function scrambleCodes(gsap: typeof import("gsap").gsap) {
       tween = gsap.to(el, {
         duration: 0.45,
         scrambleText: { text, chars: "upperCase", speed: 0.6 },
+        // A tween that stops receiving frames — throttled tab, slow device,
+        // window sent to the background mid-hover — would otherwise strand the
+        // code on a scrambled value like "VTU". Always land on the real text.
+        onComplete: () => {
+          el.textContent = text;
+        },
+        onInterrupt: () => {
+          el.textContent = text;
+        },
       });
     };
 
@@ -152,6 +163,13 @@ async function scrambleCodes(gsap: typeof import("gsap").gsap) {
     tile.addEventListener("pointerleave", reset);
     tile.addEventListener("focusin", run);
     tile.addEventListener("focusout", reset);
+    resets.push(reset);
+  });
+
+  // Frames stop while the tab is hidden, so a tween still running when the
+  // user switches away would come back stranded on a scrambled value.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) resets.forEach((r) => r());
   });
 }
 
