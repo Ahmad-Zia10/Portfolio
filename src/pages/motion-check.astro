@@ -77,6 +77,14 @@ const checks = [
       </p>
       <button class="pill mc__run" type="button" data-run>Run all checks</button>
       <p class="mc__summary" data-summary role="status" aria-live="polite"></p>
+
+      <div class="mc__report" data-report hidden>
+        <div class="mc__reportHead">
+          <span class="label">Report</span>
+          <button class="mc__copy" type="button" data-report-copy>Copy report</button>
+        </div>
+        <pre class="mc__reportText" data-report-text></pre>
+      </div>
     </header>
 
     <ol class="mc__list">
@@ -141,6 +149,48 @@ const checks = [
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     min-height: 1.4em;
+  }
+
+  .mc__report {
+    margin-top: var(--space-3);
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    color: var(--surface-fg);
+  }
+
+  .mc__report[hidden] {
+    display: none;
+  }
+
+  .mc__reportHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--hairline-ink);
+  }
+
+  .mc__copy {
+    min-height: 36px;
+    padding-inline: var(--space-2);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .mc__reportText {
+    margin: 0;
+    padding: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .mc__list {

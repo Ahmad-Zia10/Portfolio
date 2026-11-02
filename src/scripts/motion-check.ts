@@ -282,6 +282,20 @@ const RUNNERS: Record<string, () => Promise<Verdict>> = {
   freeze: checkFreeze,
 };
 
+/**
+ * Renders the last run as plain text.
+ *
+ * A run only exists in the window it happened in, so the practical way to hand
+ * it to someone is to read it off the page. This puts it in one copyable block
+ * rather than eight scattered lines.
+ */
+function reportText(passed: number, report: Array<{ id: string; pass: boolean; detail: string }>) {
+  const lines = report.map(
+    (r) => `${r.pass ? "PASS" : "FAIL"}  ${r.id.padEnd(9)} ${r.detail}`,
+  );
+  return [`motion-check — ${passed} of ${report.length} passed`, ...lines].join("\n");
+}
+
 export async function runMotionChecks() {
   const summary = document.querySelector<HTMLElement>("[data-summary]");
   const items = [...document.querySelectorAll<HTMLElement>("[data-check]")];
@@ -320,21 +334,56 @@ export async function runMotionChecks() {
     summary.textContent = `${passed} of ${items.length} passed`;
   }
 
+  const report = items.map((li) => ({
+    id: li.dataset.check!,
+    pass: li.querySelector<HTMLElement>("[data-result]")!.dataset.state === "pass",
+    detail: li.querySelector("[data-result]")!.textContent ?? "",
+  }));
+
+  showReport(passed, report);
+
   // Kept so a reload — or an HMR update mid-session — does not lose the run.
-  // Reports are the whole point of this page; losing one means running it again
-  // and possibly not reproducing the failure.
   try {
-    const report = items.map((li) => ({
-      id: li.dataset.check,
-      pass: li.querySelector<HTMLElement>("[data-result]")!.dataset.state === "pass",
-      detail: li.querySelector("[data-result]")!.textContent,
-    }));
     sessionStorage.setItem(
       "motion-check",
       JSON.stringify({ at: new Date().toISOString(), passed, report }),
     );
   } catch {
     /* private mode or blocked storage — the on-screen report still stands */
+  }
+}
+
+/** Fills the copyable text block and wires its copy button. */
+function showReport(
+  passed: number,
+  report: Array<{ id: string; pass: boolean; detail: string }>,
+) {
+  const box = document.querySelector<HTMLElement>("[data-report]");
+  const pre = document.querySelector<HTMLElement>("[data-report-text]");
+  const btn = document.querySelector<HTMLButtonElement>("[data-report-copy]");
+  if (!box || !pre) return;
+
+  const text = reportText(passed, report);
+  pre.textContent = text;
+  box.hidden = false;
+
+  if (btn && btn.dataset.bound !== "1") {
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent ?? "");
+        btn.textContent = "Copied";
+      } catch {
+        // Clipboard can be blocked; selecting the text is the fallback.
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        btn.textContent = "Selected — press Ctrl+C";
+      }
+      window.setTimeout(() => (btn.textContent = "Copy report"), 2500);
+    });
   }
 }
 
@@ -365,4 +414,6 @@ export function restoreMotionChecks() {
     const when = new Date(saved.at).toLocaleTimeString();
     summary.textContent = `${saved.passed} of ${saved.report.length} passed · restored from ${when}`;
   }
+
+  showReport(saved.passed, saved.report);
 }
